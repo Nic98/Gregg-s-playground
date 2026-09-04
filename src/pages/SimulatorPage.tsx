@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/prefer-tag-over-role -- Palette swatches use button interaction with radiogroup selection semantics. */
 import {
   useCallback,
   useEffect,
@@ -5,34 +6,38 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
+  type RefObject,
 } from 'react';
 import {
-  Binary,
+  ArrowLeft,
   Brush,
   Check,
   Eye,
-  Grid3X3,
   Image as ImageIcon,
   Info,
-  Link2,
   Lock,
   Maximize2,
+  Menu,
   Minimize2,
   Palette as PaletteIcon,
   Redo2,
   RefreshCcw,
   RotateCcw,
+  Settings2,
   Sparkles,
   Undo2,
   Unlock,
+  X,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useAppShell } from '@/src/components/AppShell';
 import { BeadCanvas, type CanvasMode } from '@/src/components/BeadCanvas';
-import { PageHeader } from '@/src/components/PageHeader';
 import { sectionRoute } from '@/src/data/syllabus';
 import {
   areaAverageResample,
@@ -58,14 +63,35 @@ interface StrokeChange {
 
 type Stroke = StrokeChange[];
 type LessonStep = 1 | 2 | 3 | 4;
+type WorkspaceView = 'explore' | 'guided';
+type MobileStageView = 'simulation' | 'compare';
 
-const resolutionPresets = [8, 16, 32, 48, 64];
-const imageUrl = `${import.meta.env.BASE_URL}assets/mona-lisa-beads.png`;
 interface SourcePaletteCache {
   samples: RGB[];
   palettes: Map<number, RGB[]>;
 }
 
+interface MetricFormulaProps {
+  width: number;
+  height: number;
+  bitsPerPixel: number;
+  totalPixels: number;
+  rawBits: number;
+  rawBytes: number;
+  maximumColourCount: number;
+  usedColours: number;
+}
+
+interface LabDialogProps {
+  children: ReactNode;
+  className?: string;
+  labelledBy: string;
+  onDismiss: () => void;
+  returnFocusRef?: RefObject<HTMLElement | null>;
+}
+
+const resolutionPresets = [8, 16, 32, 48, 64];
+const imageUrl = `${import.meta.env.BASE_URL}assets/mona-lisa-beads.png`;
 const paletteCache = new WeakMap<ImageData, SourcePaletteCache>();
 
 function getCachedPalette(source: ImageData, bitsPerPixel: number): RGB[] {
@@ -96,12 +122,132 @@ function formatNumber(value: number): string {
 }
 
 function formatRawSize(bytes: number): string {
-  if (bytes >= 1024)
+  if (bytes >= 1024) {
     return `${(bytes / 1024).toFixed(bytes % 1024 === 0 ? 0 : 2)} KiB`;
+  }
   return `${formatNumber(bytes)} bytes`;
 }
 
+function isDarkColour(colour: RGB): boolean {
+  const linearise = (channel: number) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance =
+    0.2126 * linearise(colour.r) +
+    0.7152 * linearise(colour.g) +
+    0.0722 * linearise(colour.b);
+  return luminance < 0.3;
+}
+
+function useMobileWorkbench(): boolean {
+  const query = '(max-width: 639px)';
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia(query).matches
+      : false,
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return matches;
+}
+
+function MetricFormula({
+  width,
+  height,
+  bitsPerPixel,
+  totalPixels,
+  rawBits,
+  rawBytes,
+  maximumColourCount,
+  usedColours,
+}: MetricFormulaProps) {
+  return (
+    <div
+      className="metrics-strip metric-formula"
+      aria-label="Current image data"
+    >
+      <div className="metric-formula-primary">
+        <span className="metric-factor">
+          <strong>
+            {width} × {height}
+          </strong>{' '}
+          = {formatNumber(totalPixels)} pixels
+        </span>
+        <span className="metric-operator" aria-hidden="true">
+          ×
+        </span>
+        <span className="metric-factor">
+          <strong>{bitsPerPixel} bits</strong>
+          <span className="sr-only"> ({bitsPerPixel} bpp)</span> ={' '}
+          {formatNumber(rawBits)} bits
+        </span>
+        <span className="metric-operator" aria-hidden="true">
+          =
+        </span>
+        <strong className="metric-result">{formatRawSize(rawBytes)}</strong>
+      </div>
+      <div className="metric-formula-colours">
+        <strong>
+          2<sup>{bitsPerPixel}</sup> = {formatNumber(maximumColourCount)}
+        </strong>
+        <span>maximum colours</span>
+        <span aria-hidden="true">·</span>
+        <strong>{formatNumber(usedColours)}</strong> used
+      </div>
+    </div>
+  );
+}
+
+function LabDialog({
+  children,
+  className = '',
+  labelledBy,
+  onDismiss,
+  returnFocusRef,
+}: LabDialogProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const returnFocusElement = returnFocusRef?.current;
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+
+    return () => {
+      if (dialog.open && typeof dialog.close === 'function') dialog.close();
+      returnFocusElement?.focus();
+    };
+  }, [returnFocusRef]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className={`lab-dialog ${className}`.trim()}
+      aria-labelledby={labelledBy}
+      aria-modal="true"
+      onCancel={(event) => {
+        event.preventDefault();
+        onDismiss();
+      }}
+    >
+      {children}
+    </dialog>
+  );
+}
+
 export function SimulatorPage() {
+  const { navigationOpen, openNavigation } = useAppShell();
+  const isMobileWorkbench = useMobileWorkbench();
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
   const [bitsPerPixel, setBitsPerPixel] = useState(DEFAULT_BPP);
@@ -123,23 +269,45 @@ export function SimulatorPage() {
   const [undoStack, setUndoStack] = useState<Stroke[]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('explore');
   const [lessonStep, setLessonStep] = useState<LessonStep>(1);
-  const [lessonView, setLessonView] = useState<'guided' | 'free'>('guided');
+  const [mobileStageView, setMobileStageView] =
+    useState<MobileStageView>('simulation');
   const [statusMessage, setStatusMessage] = useState(
     'Loading the reference image…',
   );
+  const [statusRevision, setStatusRevision] = useState(0);
+  const [statusVisible, setStatusVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [resetConfirmationOpen, setResetConfirmationOpen] = useState(false);
 
-  const simulatorRef = useRef<HTMLElement>(null);
+  const workbenchRef = useRef<HTMLElement>(null);
   const lessonTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const paletteSwatchRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const focusPaletteOnOpenRef = useRef(false);
   const workingRef = useRef<Uint8Array<ArrayBufferLike>>(workingIndices);
   const activeStroke = useRef(new Map<number, number>());
   const hasBuiltBoard = useRef(false);
+  const settingsTriggerRef = useRef<HTMLButtonElement>(null);
+  const settingsReturnFocusRef = useRef<HTMLElement | null>(null);
+  const resetTriggerRef = useRef<HTMLButtonElement>(null);
+
+  const announceStatus = useCallback((message: string) => {
+    setStatusMessage(message);
+    setStatusRevision((revision) => revision + 1);
+    setStatusVisible(true);
+  }, []);
 
   useEffect(() => {
     document.title = 'Pixel Bead Simulator · Gregg’s IGCSE CS Playground';
   }, []);
+
+  useEffect(() => {
+    setStatusVisible(true);
+    const timeout = window.setTimeout(() => setStatusVisible(false), 2500);
+    return () => window.clearTimeout(timeout);
+  }, [statusMessage, statusRevision]);
 
   useEffect(() => {
     let cancelled = false;
@@ -150,22 +318,22 @@ export function SimulatorPage() {
         const data = extractCanonicalCrop(image);
         setSourceData(data);
         setImageStatus('ready');
-        setStatusMessage('Reference ready. Select a bead to inspect it.');
+        announceStatus('Reference ready. Select a bead to inspect it.');
       } catch {
         setImageStatus('error');
-        setStatusMessage('The browser could not prepare the reference image.');
+        announceStatus('The browser could not prepare the reference image.');
       }
     };
     image.onerror = () => {
       if (cancelled) return;
       setImageStatus('error');
-      setStatusMessage('The reference image could not be loaded.');
+      announceStatus('The reference image could not be loaded.');
     };
     image.src = imageUrl;
     return () => {
       cancelled = true;
     };
-  }, [loadAttempt]);
+  }, [announceStatus, loadAttempt]);
 
   const palette = useMemo(() => {
     if (!sourceData) return [];
@@ -186,12 +354,12 @@ export function SimulatorPage() {
     setRedoStack([]);
     setIsDirty(false);
     if (hasBuiltBoard.current) {
-      setStatusMessage(
+      announceStatus(
         `Board rebuilt from the original reference at ${width} × ${height}, ${bitsPerPixel} bpp.`,
       );
     }
     hasBuiltBoard.current = true;
-  }, [bitsPerPixel, height, palette, sourceData, width]);
+  }, [announceStatus, bitsPerPixel, height, palette, sourceData, width]);
 
   const metrics = calculateImageMetrics(width, height, bitsPerPixel);
   const usedColours = useMemo(
@@ -202,6 +370,21 @@ export function SimulatorPage() {
     selectedCell === null ? null : (workingIndices[selectedCell] ?? null);
   const selectedColour =
     selectedPaletteIndex === null ? null : palette[selectedPaletteIndex];
+  const currentPaintColour = palette[paintIndex] ??
+    palette[0] ?? {
+      r: 17,
+      g: 20,
+      b: 15,
+    };
+  const selectedX = selectedCell === null ? null : selectedCell % width;
+  const selectedY =
+    selectedCell === null ? null : Math.floor(selectedCell / width);
+
+  useLayoutEffect(() => {
+    if (mode !== 'paint' || !focusPaletteOnOpenRef.current) return;
+    focusPaletteOnOpenRef.current = false;
+    paletteSwatchRefs.current[paintIndex]?.focus();
+  }, [mode, paintIndex]);
 
   const beginStroke = useCallback(() => {
     activeStroke.current = new Map();
@@ -212,8 +395,9 @@ export function SimulatorPage() {
       const current = workingRef.current;
       if (index < 0 || index >= current.length || current[index] === paintIndex)
         return;
-      if (!activeStroke.current.has(index))
+      if (!activeStroke.current.has(index)) {
         activeStroke.current.set(index, current[index]);
+      }
       const next = current.slice();
       next[index] = paintIndex;
       workingRef.current = next;
@@ -237,10 +421,10 @@ export function SimulatorPage() {
     setIsDirty(
       workingRef.current.some((value, index) => value !== baseIndices[index]),
     );
-    setStatusMessage(
+    announceStatus(
       `${changes.length} bead${changes.length === 1 ? '' : 's'} painted. Press Ctrl or Command + Z to undo.`,
     );
-  }, [baseIndices]);
+  }, [announceStatus, baseIndices]);
 
   const applyStroke = useCallback(
     (stroke: Stroke, direction: 'undo' | 'redo') => {
@@ -262,8 +446,8 @@ export function SimulatorPage() {
     applyStroke(stroke, 'undo');
     setUndoStack(undoStack.slice(0, -1));
     setRedoStack([...redoStack, stroke]);
-    setStatusMessage('Last paint stroke undone.');
-  }, [applyStroke, redoStack, undoStack]);
+    announceStatus('Last paint stroke undone.');
+  }, [announceStatus, applyStroke, redoStack, undoStack]);
 
   const redo = useCallback(() => {
     const stroke = redoStack.at(-1);
@@ -271,8 +455,8 @@ export function SimulatorPage() {
     applyStroke(stroke, 'redo');
     setRedoStack(redoStack.slice(0, -1));
     setUndoStack([...undoStack, stroke]);
-    setStatusMessage('Paint stroke restored.');
-  }, [applyStroke, redoStack, undoStack]);
+    announceStatus('Paint stroke restored.');
+  }, [announceStatus, applyStroke, redoStack, undoStack]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -286,6 +470,15 @@ export function SimulatorPage() {
     return () => window.removeEventListener('keydown', handleShortcut);
   }, [redo, undo]);
 
+  const chooseMode = (nextMode: CanvasMode) => {
+    setMode(nextMode);
+    announceStatus(
+      nextMode === 'paint'
+        ? 'Paint mode is on. Choose a colour, then draw on the board.'
+        : 'Inspect mode is on. Select a bead to read its stored value.',
+    );
+  };
+
   const restoreImage = () => {
     const restored = baseIndices.slice();
     workingRef.current = restored;
@@ -294,32 +487,46 @@ export function SimulatorPage() {
     setUndoStack([]);
     setRedoStack([]);
     setIsDirty(false);
-    setStatusMessage(
+    announceStatus(
       'Artwork restored from the reference at the current settings.',
     );
   };
 
-  const resetDemo = () => {
+  const performResetDemo = () => {
+    const settingsAlreadyDefault =
+      width === DEFAULT_WIDTH &&
+      height === DEFAULT_HEIGHT &&
+      bitsPerPixel === DEFAULT_BPP;
     setWidth(DEFAULT_WIDTH);
     setHeight(DEFAULT_HEIGHT);
     setBitsPerPixel(DEFAULT_BPP);
     setAspectLocked(true);
     setMode('inspect');
     setPaintIndex(0);
+    setSelectedCell(null);
     setLessonStep(1);
-    setLessonView('guided');
-    setStatusMessage('Demo reset to 32 × 32 pixels and 4 bpp.');
-    if (
-      width === DEFAULT_WIDTH &&
-      height === DEFAULT_HEIGHT &&
-      bitsPerPixel === DEFAULT_BPP
-    )
-      restoreImage();
+    setWorkspaceView('explore');
+    setMobileStageView('simulation');
+    setUndoStack([]);
+    setRedoStack([]);
+    setIsDirty(false);
+    if (settingsAlreadyDefault) {
+      const restored = baseIndices.slice();
+      workingRef.current = restored;
+      setWorkingIndices(restored);
+    }
+    setResetConfirmationOpen(false);
+    announceStatus('Demo reset to 32 × 32 pixels and 4 bpp.');
+  };
+
+  const requestResetDemo = () => {
+    if (isDirty) setResetConfirmationOpen(true);
+    else performResetDemo();
   };
 
   const retryImage = () => {
     setImageStatus('loading');
-    setStatusMessage('Loading the reference image…');
+    announceStatus('Loading the reference image…');
     setLoadAttempt((value) => value + 1);
   };
 
@@ -337,6 +544,11 @@ export function SimulatorPage() {
     const nextLocked = !aspectLocked;
     if (nextLocked && width !== height) setHeight(width);
     setAspectLocked(nextLocked);
+    announceStatus(
+      nextLocked
+        ? 'Aspect lock on. Width and height now change together.'
+        : 'Aspect lock off. Width and height can change independently.',
+    );
   };
 
   const applyPreset = (
@@ -348,21 +560,34 @@ export function SimulatorPage() {
     setWidth(nextWidth);
     setHeight(nextHeight);
     setBitsPerPixel(nextBits);
-    setStatusMessage(message);
+    announceStatus(message);
+  };
+
+  const applyGuidedPreset = (
+    nextWidth: number,
+    nextHeight: number,
+    nextBits: number,
+    message: string,
+  ) => {
+    applyPreset(nextWidth, nextHeight, nextBits, message);
+    if (isMobileWorkbench) setSettingsOpen(false);
   };
 
   const toggleFullscreen = async () => {
     try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await simulatorRef.current?.requestFullscreen();
+      if (document.fullscreenElement === workbenchRef.current) {
+        await document.exitFullscreen();
+      } else {
+        await workbenchRef.current?.requestFullscreen();
+      }
     } catch {
-      setStatusMessage('Fullscreen is not available in this browser.');
+      announceStatus('Fullscreen is not available in this browser.');
     }
   };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(document.fullscreenElement === simulatorRef.current);
+      setIsFullscreen(document.fullscreenElement === workbenchRef.current);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () =>
@@ -374,10 +599,12 @@ export function SimulatorPage() {
     step: LessonStep,
   ) => {
     let nextStep = step;
-    if (event.key === 'ArrowLeft')
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
       nextStep = Math.max(1, step - 1) as LessonStep;
-    if (event.key === 'ArrowRight')
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
       nextStep = Math.min(4, step + 1) as LessonStep;
+    }
     if (event.key === 'Home') nextStep = 1;
     if (event.key === 'End') nextStep = 4;
     if (nextStep === step) return;
@@ -386,750 +613,1040 @@ export function SimulatorPage() {
     lessonTabRefs.current[nextStep - 1]?.focus();
   };
 
+  const paletteTargetForKey = (
+    button: HTMLButtonElement,
+    index: number,
+    key: string,
+  ): number => {
+    if (key === 'Home') return 0;
+    if (key === 'End') return palette.length - 1;
+    if (key === 'ArrowLeft') return Math.max(0, index - 1);
+    if (key === 'ArrowRight') return Math.min(palette.length - 1, index + 1);
+    if (key !== 'ArrowUp' && key !== 'ArrowDown') return index;
+
+    const grid = button.closest('.palette-grid');
+    if (!grid) return index;
+    const swatches = [
+      ...grid.querySelectorAll<HTMLButtonElement>('[role="radio"]'),
+    ];
+    const currentTop = button.offsetTop;
+    const targetRows = swatches
+      .map((swatch, swatchIndex) => ({
+        swatch,
+        swatchIndex,
+        top: swatch.offsetTop,
+      }))
+      .filter(({ top }) =>
+        key === 'ArrowUp' ? top < currentTop : top > currentTop,
+      );
+    if (targetRows.length === 0) return index;
+    const targetTop =
+      key === 'ArrowUp'
+        ? Math.max(...targetRows.map(({ top }) => top))
+        : Math.min(...targetRows.map(({ top }) => top));
+    const centre = button.offsetLeft + button.offsetWidth / 2;
+    const nearest = targetRows
+      .filter(({ top }) => top === targetTop)
+      .sort(
+        (a, b) =>
+          Math.abs(a.swatch.offsetLeft + a.swatch.offsetWidth / 2 - centre) -
+          Math.abs(b.swatch.offsetLeft + b.swatch.offsetWidth / 2 - centre),
+      )[0];
+    return nearest?.swatchIndex ?? index;
+  };
+
   const handlePaletteKeyDown = (
     event: React.KeyboardEvent<HTMLButtonElement>,
     index: number,
   ) => {
-    let nextIndex = index;
-    if (event.key === 'ArrowLeft') nextIndex = Math.max(0, index - 1);
-    if (event.key === 'ArrowRight')
-      nextIndex = Math.min(palette.length - 1, index + 1);
-    if (event.key === 'ArrowUp') nextIndex = Math.max(0, index - 8);
-    if (event.key === 'ArrowDown')
-      nextIndex = Math.min(palette.length - 1, index + 8);
-    if (event.key === 'Home') nextIndex = 0;
-    if (event.key === 'End') nextIndex = palette.length - 1;
-    if (nextIndex === index) return;
+    if (
+      ![
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+        'Home',
+        'End',
+      ].includes(event.key)
+    ) {
+      return;
+    }
+    const nextIndex = paletteTargetForKey(
+      event.currentTarget,
+      index,
+      event.key,
+    );
     event.preventDefault();
     setPaintIndex(nextIndex);
     setMode('paint');
     paletteSwatchRefs.current[nextIndex]?.focus();
   };
 
-  const selectedX = selectedCell === null ? null : selectedCell % width;
-  const selectedY =
-    selectedCell === null ? null : Math.floor(selectedCell / width);
+  const renderPalette = () => (
+    <div className="palette-section">
+      <div className="control-title">
+        <span>Available palette</span>
+        <Badge variant="outline">{palette.length} colours</Badge>
+      </div>
+      <div
+        className="palette-grid"
+        role="radiogroup"
+        aria-label={`${palette.length} available paint colours`}
+      >
+        {palette.map((colour, index) => (
+          <button
+            key={`${rgbToHex(colour)}-${index}`}
+            ref={(node) => {
+              paletteSwatchRefs.current[index] = node;
+            }}
+            type="button"
+            role="radio"
+            aria-checked={paintIndex === index}
+            aria-label={`Palette ${index}, code ${binaryCode(index, bitsPerPixel)}, ${rgbToHex(colour)}`}
+            title={`${binaryCode(index, bitsPerPixel)} · ${rgbToHex(colour)}`}
+            className={
+              paintIndex === index
+                ? 'palette-swatch palette-swatch-selected'
+                : 'palette-swatch'
+            }
+            style={{
+              background: rgbToHex(colour),
+              color: isDarkColour(colour) ? '#ffffff' : '#11140f',
+            }}
+            tabIndex={paintIndex === index ? 0 : -1}
+            onClick={() => {
+              setPaintIndex(index);
+              setMode('paint');
+              announceStatus(
+                `Paint colour ${index} selected: ${rgbToHex(colour)}.`,
+              );
+            }}
+            onKeyDown={(event) => handlePaletteKeyDown(event, index)}
+          >
+            {paintIndex === index && <Check aria-hidden="true" />}
+          </button>
+        ))}
+      </div>
+      <p className="palette-help">
+        Choose a colour, then click or drag across the board. Arrow keys follow
+        the palette’s visible rows and columns.
+      </p>
+    </div>
+  );
 
-  return (
-    <main className="page-wrap simulator-page" ref={simulatorRef}>
-      <PageHeader
-        eyebrow={
-          <>
-            <PaletteIcon /> Image representation{' '}
-            <Badge variant="secondary">Topic 1.2</Badge>
-          </>
-        }
-        title="Pixel Bead Simulator"
-        description="Change the number of pixels and bits per pixel. Watch spatial detail, available colours and theoretical file size respond in real time."
-        breadcrumbs={[
-          { label: '1.2 Text, sound and images', route: sectionRoute },
-          { label: 'Pixel Bead Simulator' },
-        ]}
-        action={
-          <Button variant="outline" size="lg" onClick={toggleFullscreen}>
-            {isFullscreen ? <Minimize2 /> : <Maximize2 />}
-            {isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-          </Button>
-        }
+  const renderCurrentColour = () => (
+    <div className="current-colour-readout" aria-label="Current paint colour">
+      <span
+        className="current-colour-chip"
+        style={{ background: rgbToHex(currentPaintColour) }}
+        aria-hidden="true"
       />
+      <span>
+        <small>Current colour</small>
+        <strong>{rgbToHex(currentPaintColour)}</strong>
+      </span>
+      <span>
+        <small>Palette index</small>
+        <strong>{paintIndex}</strong>
+      </span>
+      <span>
+        <small>{bitsPerPixel}-bit code</small>
+        <strong className="binary-value">
+          {binaryCode(paintIndex, bitsPerPixel)}
+        </strong>
+      </span>
+    </div>
+  );
 
-      <div className="metrics-strip" aria-label="Current image data">
-        <div>
+  const renderExploreControls = (idPrefix: string) => (
+    <div className="explore-controls">
+      {renderCurrentColour()}
+
+      {isDirty && (
+        <Alert className="paint-warning edits-warning">
+          <Info />
+          <AlertTitle>Paint edits are on the board</AlertTitle>
+          <AlertDescription>
+            Changing resolution or colour depth rebuilds the board and clears
+            those edits.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="control-section resolution-controls">
+        <div className="control-title">
           <span>Resolution</span>
-          <strong>
-            {width} × {height}
-          </strong>
-          <small>pixel dimensions</small>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleAspectLock}
+            aria-pressed={aspectLocked}
+          >
+            {aspectLocked ? <Lock /> : <Unlock />}
+            {aspectLocked ? 'Linked' : 'Independent'}
+          </Button>
         </div>
-        <div>
-          <span>Total pixels</span>
-          <strong>{formatNumber(metrics.totalPixels)}</strong>
-          <small>
-            {width} × {height}
-          </small>
+        <div className="slider-control">
+          <label htmlFor={`${idPrefix}-width-slider`}>
+            <span>Width</span>
+            <output>{width} px</output>
+          </label>
+          <Slider
+            id={`${idPrefix}-width-slider`}
+            min={8}
+            max={64}
+            step={4}
+            value={[width]}
+            onValueChange={(value) => changeWidth(scalarSliderValue(value))}
+            aria-label="Image width in pixels"
+          />
         </div>
-        <div>
-          <span>Colour depth</span>
-          <strong>{bitsPerPixel} bpp</strong>
-          <small>bits per pixel</small>
+        <div className="slider-control">
+          <label htmlFor={`${idPrefix}-height-slider`}>
+            <span>Height</span>
+            <output>{height} px</output>
+          </label>
+          <Slider
+            id={`${idPrefix}-height-slider`}
+            min={8}
+            max={64}
+            step={4}
+            value={[height]}
+            onValueChange={(value) => changeHeight(scalarSliderValue(value))}
+            aria-label="Image height in pixels"
+            disabled={aspectLocked}
+          />
         </div>
-        <div>
-          <span>Maximum colours</span>
-          <strong>{formatNumber(metrics.maximumColours)}</strong>
-          <small>{formatNumber(usedColours)} used now</small>
-        </div>
-        <div className="size-metric">
-          <span>Raw pixel data</span>
-          <strong>{formatRawSize(metrics.rawBytes)}</strong>
-          <small>{formatNumber(metrics.rawBits)} bits</small>
+        <div className="preset-row" aria-label="Square resolution presets">
+          {resolutionPresets.map((preset) => (
+            <Button
+              key={preset}
+              variant={
+                width === preset && height === preset ? 'secondary' : 'ghost'
+              }
+              size="sm"
+              aria-pressed={width === preset && height === preset}
+              onClick={() =>
+                applyPreset(
+                  preset,
+                  preset,
+                  bitsPerPixel,
+                  `Resolution set to ${preset} × ${preset}.`,
+                )
+              }
+            >
+              {preset}
+            </Button>
+          ))}
         </div>
       </div>
 
-      <div className="simulator-grid">
-        <section
-          className="visual-lab"
-          aria-label="Reference and simulated image comparison"
+      <div className="control-section colour-depth-controls">
+        <div className="control-title">
+          <span>Colour depth</span>
+          <strong>{bitsPerPixel} bpp</strong>
+        </div>
+        <div className="slider-control">
+          <label htmlFor={`${idPrefix}-bpp-slider`}>
+            <span>Bits per pixel</span>
+            <output>
+              {formatNumber(maximumColours(bitsPerPixel))} colours
+            </output>
+          </label>
+          <Slider
+            id={`${idPrefix}-bpp-slider`}
+            min={1}
+            max={8}
+            step={1}
+            value={[bitsPerPixel]}
+            onValueChange={(value) => setBitsPerPixel(scalarSliderValue(value))}
+            aria-label="Colour depth in bits per pixel"
+          />
+          <div className="slider-ticks" aria-hidden="true">
+            {Array.from({ length: 8 }, (_, index) => (
+              <span key={index}>{index + 1}</span>
+            ))}
+          </div>
+        </div>
+        <details className="true-colour-note">
+          <summary>
+            <Sparkles /> What about 24-bit True Colour?
+          </summary>
+          <p>
+            <strong>24 bpp = 8 bits for red + 8 for green + 8 for blue.</strong>{' '}
+            It can represent 2<sup>24</sup> = 16,777,216 colours. At {width} ×{' '}
+            {height}, its raw pixel data would be{' '}
+            {formatRawSize(Math.ceil((width * height * 24) / 8))}.
+          </p>
+        </details>
+      </div>
+
+      {mode === 'paint' ? (
+        renderPalette()
+      ) : (
+        <div className="palette-collapsed">
+          <PaletteIcon aria-hidden="true" />
+          <span>
+            <strong>
+              {formatNumber(metrics.maximumColours)} maximum colours
+            </strong>
+            <small>{formatNumber(usedColours)} used on this board</small>
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(event) => {
+              focusPaletteOnOpenRef.current = event.detail === 0;
+              chooseMode('paint');
+            }}
+          >
+            Open palette
+          </Button>
+        </div>
+      )}
+
+      <div className="history-actions">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={restoreImage}
+          disabled={!isDirty}
         >
-          <div className="visual-pair">
-            <article className="image-panel">
-              <div className="panel-heading">
-                <span>Reference image</span>
-                <Badge variant="outline">Original</Badge>
-              </div>
-              <div className="image-frame reference-frame">
-                <img
-                  src={imageUrl}
-                  alt="A Mona Lisa-inspired portrait made from coloured building blocks"
-                />
-                <span className="sample-boundary" aria-hidden="true">
-                  <b>sampled area</b>
-                </span>
-              </div>
-              <p className="fine-print">
-                The complete source is shown. Its white frame and transparent
-                corners are excluded from sampling.
-              </p>
-            </article>
+          <RotateCcw /> Restore image
+        </Button>
+        <Button
+          ref={resetTriggerRef}
+          variant="ghost"
+          size="lg"
+          onClick={requestResetDemo}
+        >
+          <RefreshCcw /> Reset demo
+        </Button>
+      </div>
+    </div>
+  );
 
-            <article className="image-panel">
-              <div className="panel-heading">
-                <span>Bead simulation</span>
-                <Badge>
-                  {width} × {height}
-                </Badge>
-              </div>
-              <div className="canvas-frame">
-                {imageStatus === 'ready' && workingIndices.length > 0 ? (
-                  <BeadCanvas
-                    width={width}
-                    height={height}
-                    palette={palette}
-                    indices={workingIndices}
-                    mode={mode}
-                    paintIndex={paintIndex}
-                    selectedCell={selectedCell}
-                    onSelectCell={setSelectedCell}
-                    onBeginStroke={beginStroke}
-                    onPaintCell={paintCell}
-                    onFinishStroke={finishStroke}
-                  />
-                ) : imageStatus === 'error' ? (
-                  <div className="canvas-state">
-                    <ImageIcon />
-                    <strong>Reference unavailable</strong>
-                    <span>Check the image asset, then try again.</span>
-                    <Button variant="outline" onClick={retryImage}>
-                      <RefreshCcw /> Retry
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="canvas-state">
-                    <span className="loading-bead" />
-                    <strong>Building the palette…</strong>
-                  </div>
-                )}
-              </div>
-              <p className="fine-print">
-                The display size stays fixed, so fewer pixels become visibly
-                larger.
-              </p>
-            </article>
-          </div>
+  const renderGuidedRail = () => {
+    const lessonLabels = ['Pixel', 'Resolution', 'Colour depth', 'File size'];
+    return (
+      <div className="guided-rail">
+        {isDirty && (
+          <Alert className="paint-warning edits-warning">
+            <Info />
+            <AlertTitle>Paint edits are on the board</AlertTitle>
+            <AlertDescription>
+              Applying a lesson preset rebuilds the board and clears those
+              edits.
+            </AlertDescription>
+          </Alert>
+        )}
+        <div
+          className="lesson-steps guided-stepper"
+          role="tablist"
+          aria-label="Guided lesson steps"
+          aria-orientation="vertical"
+        >
+          {([1, 2, 3, 4] as LessonStep[]).map((step) => (
+            <button
+              key={step}
+              ref={(node) => {
+                lessonTabRefs.current[step - 1] = node;
+              }}
+              id={`lesson-tab-${step}`}
+              role="tab"
+              aria-controls="guided-rail-panel"
+              aria-selected={lessonStep === step}
+              tabIndex={lessonStep === step ? 0 : -1}
+              className={
+                lessonStep === step
+                  ? 'lesson-step lesson-step-active'
+                  : 'lesson-step'
+              }
+              onClick={() => setLessonStep(step)}
+              onKeyDown={(event) => handleLessonKeyDown(event, step)}
+            >
+              <span>{step}</span>
+              {lessonLabels[step - 1]}
+            </button>
+          ))}
+        </div>
 
-          <div className="pixel-inspector" aria-live="polite">
-            <div className="inspector-title">
-              <Eye />
-              <span>
-                <strong>Pixel inspector</strong>
-                <small>
-                  {selectedCell === null
-                    ? 'Select any bead on the board.'
-                    : 'One bead = one pixel.'}
-                </small>
-              </span>
-            </div>
-            {selectedCell !== null &&
-            selectedColour &&
-            selectedPaletteIndex !== null ? (
-              <div className="inspector-values">
-                <span>
-                  <small>Coordinate</small>
-                  <strong>
-                    ({selectedX}, {selectedY})
-                  </strong>
-                </span>
-                <span>
-                  <small>Palette index</small>
-                  <strong>{selectedPaletteIndex}</strong>
-                </span>
-                <span>
-                  <small>Example {bitsPerPixel}-bit code</small>
-                  <strong className="binary-value">
-                    {binaryCode(selectedPaletteIndex, bitsPerPixel)}
-                  </strong>
-                </span>
-                <span>
-                  <small>Colour</small>
-                  <strong>
-                    <i style={{ background: rgbToHex(selectedColour) }} />
-                    {rgbToHex(selectedColour)}
-                  </strong>
-                </span>
-              </div>
-            ) : (
+        <div
+          className="guided-rail-content"
+          id="guided-rail-panel"
+          role="tabpanel"
+          aria-labelledby={`lesson-tab-${lessonStep}`}
+          tabIndex={0}
+        >
+          {lessonStep === 1 && (
+            <>
+              <p className="section-kicker">Step 1 · Pixel</p>
+              <h3>One bead stores one picture element.</h3>
               <p>
-                Use Inspect mode and click a bead to reveal its coordinate,
-                palette entry and binary index.
+                A pixel is the smallest addressable picture element in a raster
+                image. Inspect one bead to reveal its coordinate, palette entry
+                and stored binary code.
               </p>
-            )}
-          </div>
-        </section>
+              <div className="lesson-buttons">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    applyGuidedPreset(
+                      16,
+                      16,
+                      3,
+                      'Pixel preset A ready at 16 × 16.',
+                    );
+                    setMode('inspect');
+                  }}
+                >
+                  A · 16 × 16
+                </Button>
+                <Button
+                  onClick={() => {
+                    applyGuidedPreset(
+                      32,
+                      32,
+                      4,
+                      'Pixel preset B ready at 32 × 32.',
+                    );
+                    setMode('inspect');
+                  }}
+                >
+                  B · 32 × 32
+                </Button>
+              </div>
+            </>
+          )}
+          {lessonStep === 2 && (
+            <>
+              <p className="section-kicker">Step 2 · Image resolution</p>
+              <h3>More pixels can represent more spatial detail.</h3>
+              <p>
+                Resolution means width × height in pixels. Keep colour depth at
+                4 bpp and compare the two presets. This is not PPI or DPI.
+              </p>
+              <div className="lesson-buttons">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    applyGuidedPreset(
+                      8,
+                      8,
+                      4,
+                      'Low-resolution example: 8 × 8 at 4 bpp.',
+                    )
+                  }
+                >
+                  A · 8 × 8
+                </Button>
+                <Button
+                  onClick={() =>
+                    applyGuidedPreset(
+                      48,
+                      48,
+                      4,
+                      'High-resolution example: 48 × 48 at 4 bpp.',
+                    )
+                  }
+                >
+                  B · 48 × 48
+                </Button>
+              </div>
+            </>
+          )}
+          {lessonStep === 3 && (
+            <>
+              <p className="section-kicker">Step 3 · Colour depth</p>
+              <h3>Each extra bit doubles the available colours.</h3>
+              <p>
+                At 32 × 32, compare 1 bpp with 8 bpp. Colour depth changes the
+                possible colour choices—not the number of pixels.
+              </p>
+              <div className="lesson-buttons">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    applyGuidedPreset(
+                      32,
+                      32,
+                      1,
+                      'Low colour-depth example: 1 bpp.',
+                    )
+                  }
+                >
+                  A · 1 bpp · 2 colours
+                </Button>
+                <Button
+                  onClick={() =>
+                    applyGuidedPreset(
+                      32,
+                      32,
+                      8,
+                      'High colour-depth example: 8 bpp.',
+                    )
+                  }
+                >
+                  B · 8 bpp · 256 colours
+                </Button>
+              </div>
+            </>
+          )}
+          {lessonStep === 4 && (
+            <>
+              <p className="section-kicker">Step 4 · File size</p>
+              <h3>Pixels × bits per pixel = raw image data.</h3>
+              <p>
+                Different settings can produce the same theoretical size. Both
+                examples below equal 2,048 bits, or 256 bytes.
+              </p>
+              <div className="lesson-buttons">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    applyGuidedPreset(
+                      16,
+                      16,
+                      8,
+                      '256 pixels × 8 bpp = 2,048 bits.',
+                    )
+                  }
+                >
+                  A · 16² × 8 bpp
+                </Button>
+                <Button
+                  onClick={() =>
+                    applyGuidedPreset(
+                      32,
+                      32,
+                      2,
+                      '1,024 pixels × 2 bpp = 2,048 bits.',
+                    )
+                  }
+                >
+                  B · 32² × 2 bpp
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
 
-        <aside className="controls-panel" aria-label="Simulator controls">
-          <div className="control-section mode-section">
-            <div className="control-title">
-              <span>Tool</span>
-              {isDirty && <Badge variant="outline">Edited</Badge>}
+  const simulationPanel = (
+    <article className="image-panel simulation-panel">
+      <div className="panel-heading canvas-toolbar">
+        <span className="simulation-label">
+          <i aria-hidden="true" /> Simulation
+          <Badge>
+            {width} × {height}
+          </Badge>
+        </span>
+        <div className="canvas-tools">
+          <fieldset className="mode-switch">
+            <legend className="sr-only">Board tool</legend>
+            <Button
+              variant={mode === 'inspect' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => chooseMode('inspect')}
+              aria-pressed={mode === 'inspect'}
+            >
+              <Eye /> Inspect
+            </Button>
+            <Button
+              variant={mode === 'paint' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => chooseMode('paint')}
+              aria-pressed={mode === 'paint'}
+            >
+              <Brush /> Paint
+            </Button>
+          </fieldset>
+          <span className="canvas-history">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={undo}
+              disabled={undoStack.length === 0}
+              aria-label="Undo"
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={redo}
+              disabled={redoStack.length === 0}
+              aria-label="Redo"
+            >
+              <Redo2 />
+            </Button>
+          </span>
+        </div>
+      </div>
+      <div className="canvas-frame simulation-frame">
+        {imageStatus === 'ready' && workingIndices.length > 0 ? (
+          <BeadCanvas
+            width={width}
+            height={height}
+            palette={palette}
+            indices={workingIndices}
+            mode={mode}
+            paintIndex={paintIndex}
+            selectedCell={selectedCell}
+            onSelectCell={setSelectedCell}
+            onBeginStroke={beginStroke}
+            onPaintCell={paintCell}
+            onFinishStroke={finishStroke}
+          />
+        ) : imageStatus === 'error' ? (
+          <div className="canvas-state">
+            <ImageIcon />
+            <strong>Reference unavailable</strong>
+            <span>Check the image asset, then try again.</span>
+            <Button variant="outline" onClick={retryImage}>
+              <RefreshCcw /> Retry
+            </Button>
+          </div>
+        ) : (
+          <div className="canvas-state">
+            <span className="loading-bead" />
+            <strong>Building the palette…</strong>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+
+  const referencePanel = (
+    <article className="image-panel reference-panel">
+      <div className="panel-heading">
+        <span>Reference</span>
+        <Badge variant="outline">Original</Badge>
+      </div>
+      <div className="image-frame reference-frame">
+        <img
+          src={imageUrl}
+          alt="A Mona Lisa-inspired portrait made from coloured building blocks"
+        />
+        <span className="sample-boundary" aria-hidden="true">
+          <b>sampled area</b>
+        </span>
+        <span className="sampling-note">
+          White frame excluded from colour analysis
+        </span>
+      </div>
+    </article>
+  );
+
+  return (
+    <main className="page-wrap simulator-page">
+      <section
+        ref={workbenchRef}
+        className="lab-workbench"
+        aria-labelledby="simulator-title"
+      >
+        <header className="lab-toolbar">
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            onClick={openNavigation}
+            aria-label="Open course navigation"
+            aria-haspopup="dialog"
+            aria-expanded={navigationOpen}
+          >
+            <Menu />
+          </Button>
+          <Link
+            to={sectionRoute}
+            className={`${buttonVariants({ variant: 'ghost', size: 'sm' })} lab-back-link`}
+          >
+            <ArrowLeft />
+            <span>1.2 Text, sound and images</span>
+          </Link>
+          <div className="lab-toolbar-title">
+            <PaletteIcon aria-hidden="true" />
+            <span>
+              <small>Image representation lab</small>
+              <h1 id="simulator-title">Pixel Bead Simulator</h1>
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 /> : <Maximize2 />}
+            <span>{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+          </Button>
+        </header>
+
+        <MetricFormula
+          width={width}
+          height={height}
+          bitsPerPixel={bitsPerPixel}
+          totalPixels={metrics.totalPixels}
+          rawBits={metrics.rawBits}
+          rawBytes={metrics.rawBytes}
+          maximumColourCount={metrics.maximumColours}
+          usedColours={usedColours}
+        />
+
+        {isMobileWorkbench && (
+          <fieldset className="mobile-stage-switch">
+            <legend className="sr-only">Mobile stage view</legend>
+            <Button
+              variant={mobileStageView === 'simulation' ? 'default' : 'outline'}
+              aria-pressed={mobileStageView === 'simulation'}
+              onClick={() => setMobileStageView('simulation')}
+            >
+              Simulation
+            </Button>
+            <Button
+              variant={mobileStageView === 'compare' ? 'default' : 'outline'}
+              aria-pressed={mobileStageView === 'compare'}
+              onClick={() => setMobileStageView('compare')}
+            >
+              Compare
+            </Button>
+          </fieldset>
+        )}
+
+        <div className="simulator-grid lab-layout">
+          <section
+            className="visual-lab comparison-stage"
+            aria-label="Reference and simulated image comparison"
+          >
+            <div
+              className="visual-pair"
+              data-mobile-stage-view={mobileStageView}
+            >
+              {simulationPanel}
+              {(!isMobileWorkbench || mobileStageView === 'compare') &&
+                referencePanel}
             </div>
-            <fieldset className="mode-switch">
-              <legend className="sr-only">Board tool</legend>
+
+            <div className="pixel-inspector pixel-readout">
+              <output className="sr-only" aria-live="polite" aria-atomic="true">
+                {selectedCell !== null &&
+                selectedColour &&
+                selectedPaletteIndex !== null
+                  ? `Pixel ${selectedX}, ${selectedY}. Palette index ${selectedPaletteIndex}. ${bitsPerPixel}-bit code ${binaryCode(selectedPaletteIndex, bitsPerPixel)}. Colour ${rgbToHex(selectedColour)}.`
+                  : ''}
+              </output>
+              <div className="inspector-title">
+                <Eye />
+                <span>
+                  <strong>Pixel inspector</strong>
+                  <small>
+                    {selectedCell === null
+                      ? 'Select any bead on the board.'
+                      : 'One bead = one pixel.'}
+                  </small>
+                </span>
+              </div>
+              {selectedCell !== null &&
+              selectedColour &&
+              selectedPaletteIndex !== null ? (
+                <div className="inspector-values">
+                  <span>
+                    <small>Coordinate</small>
+                    <strong>
+                      ({selectedX}, {selectedY})
+                    </strong>
+                  </span>
+                  <span>
+                    <small>Palette index</small>
+                    <strong>{selectedPaletteIndex}</strong>
+                  </span>
+                  <span>
+                    <small>{bitsPerPixel}-bit code</small>
+                    <strong className="binary-value">
+                      {binaryCode(selectedPaletteIndex, bitsPerPixel)}
+                    </strong>
+                  </span>
+                  <span>
+                    <small>Hex colour</small>
+                    <strong>
+                      <i style={{ background: rgbToHex(selectedColour) }} />
+                      {rgbToHex(selectedColour)}
+                    </strong>
+                  </span>
+                </div>
+              ) : (
+                <p>
+                  Use Inspect and select a bead to reveal its coordinate,
+                  palette entry and binary index.
+                </p>
+              )}
+            </div>
+          </section>
+
+          {!isMobileWorkbench && (
+            <aside
+              className="controls-panel lab-rail"
+              aria-label="Lab controls"
+            >
+              <div className="rail-header">
+                <div>
+                  <p className="section-kicker">Workspace</p>
+                  <h2>{workspaceView === 'explore' ? 'Explore' : 'Guided'}</h2>
+                </div>
+                <fieldset className="workspace-switch">
+                  <legend className="sr-only">Workspace view</legend>
+                  <Button
+                    variant={
+                      workspaceView === 'explore' ? 'default' : 'outline'
+                    }
+                    size="sm"
+                    aria-pressed={workspaceView === 'explore'}
+                    onClick={() => setWorkspaceView('explore')}
+                  >
+                    Explore
+                  </Button>
+                  <Button
+                    variant={workspaceView === 'guided' ? 'default' : 'outline'}
+                    size="sm"
+                    aria-pressed={workspaceView === 'guided'}
+                    onClick={() => setWorkspaceView('guided')}
+                  >
+                    Guided
+                  </Button>
+                </fieldset>
+              </div>
+              <div className="rail-scroll">
+                {workspaceView === 'explore'
+                  ? renderExploreControls('rail')
+                  : renderGuidedRail()}
+              </div>
+            </aside>
+          )}
+        </div>
+
+        <output
+          className={`lab-status ${statusVisible ? 'lab-status-visible' : ''}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {statusMessage}
+        </output>
+
+        {isMobileWorkbench && (
+          <div
+            className="mobile-lab-dock"
+            role="toolbar"
+            aria-label="Mobile lab actions"
+          >
+            <div className="mobile-mode-switch">
               <Button
-                variant={mode === 'inspect' ? 'default' : 'outline'}
-                size="lg"
-                onClick={() => setMode('inspect')}
+                variant={mode === 'inspect' ? 'default' : 'ghost'}
                 aria-pressed={mode === 'inspect'}
+                onClick={() => chooseMode('inspect')}
               >
                 <Eye /> Inspect
               </Button>
               <Button
-                variant={mode === 'paint' ? 'default' : 'outline'}
-                size="lg"
-                onClick={() => setMode('paint')}
+                variant={mode === 'paint' ? 'default' : 'ghost'}
                 aria-pressed={mode === 'paint'}
+                onClick={() => chooseMode('paint')}
               >
                 <Brush /> Paint
               </Button>
-            </fieldset>
-            {mode === 'paint' && (
-              <Alert className="paint-warning">
-                <Info />
-                <AlertTitle>Paint mode is on</AlertTitle>
-                <AlertDescription>
-                  Changing resolution or colour depth rebuilds the board and
-                  clears paint edits.
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-
-          <div className="control-section">
-            <div className="control-title">
-              <span>Image resolution</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleAspectLock}
-                aria-pressed={aspectLocked}
-              >
-                {aspectLocked ? <Lock /> : <Unlock />}
-                {aspectLocked ? 'Linked' : 'Independent'}
-              </Button>
             </div>
-            <div className="slider-control">
-              <label htmlFor="width-slider">
-                <span>Width</span>
-                <output>{width} px</output>
-              </label>
-              <Slider
-                id="width-slider"
-                min={8}
-                max={64}
-                step={4}
-                value={[width]}
-                onValueChange={(value) => changeWidth(scalarSliderValue(value))}
-                aria-label="Image width in pixels"
-              />
-            </div>
-            <div className="slider-control">
-              <label htmlFor="height-slider">
-                <span>Height</span>
-                <output>{height} px</output>
-              </label>
-              <Slider
-                id="height-slider"
-                min={8}
-                max={64}
-                step={4}
-                value={[height]}
-                onValueChange={(value) =>
-                  changeHeight(scalarSliderValue(value))
-                }
-                aria-label="Image height in pixels"
-                disabled={aspectLocked}
-              />
-            </div>
-            <div className="preset-row" aria-label="Square resolution presets">
-              {resolutionPresets.map((preset) => (
-                <Button
-                  key={preset}
-                  variant={
-                    width === preset && height === preset
-                      ? 'secondary'
-                      : 'ghost'
-                  }
-                  size="sm"
-                  onClick={() =>
-                    applyPreset(
-                      preset,
-                      preset,
-                      bitsPerPixel,
-                      `Resolution set to ${preset} × ${preset}.`,
-                    )
-                  }
-                >
-                  {preset}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="control-section">
-            <div className="control-title">
-              <span>Colour depth</span>
-              <strong>{bitsPerPixel} bpp</strong>
-            </div>
-            <div className="slider-control">
-              <label htmlFor="bpp-slider">
-                <span>Bits per pixel</span>
-                <output>
-                  {formatNumber(maximumColours(bitsPerPixel))} colours
-                </output>
-              </label>
-              <Slider
-                id="bpp-slider"
-                min={1}
-                max={8}
-                step={1}
-                value={[bitsPerPixel]}
-                onValueChange={(value) =>
-                  setBitsPerPixel(scalarSliderValue(value))
-                }
-                aria-label="Colour depth in bits per pixel"
-              />
-              <div className="slider-ticks" aria-hidden="true">
-                {Array.from({ length: 8 }, (_, index) => (
-                  <span key={index}>{index + 1}</span>
-                ))}
-              </div>
-            </div>
-            <details className="true-colour-note">
-              <summary>
-                <Sparkles /> What about 24-bit True Colour?
-              </summary>
-              <p>
-                <strong>
-                  24 bpp = 8 bits for red + 8 for green + 8 for blue.
-                </strong>{' '}
-                It can represent 2<sup>24</sup> = 16,777,216 colours. At {width}{' '}
-                × {height}, its raw pixel data would be{' '}
-                {formatRawSize(Math.ceil((width * height * 24) / 8))}.
-              </p>
-            </details>
-          </div>
-
-          <div className="control-section palette-section">
-            <div className="control-title">
-              <span>Available palette</span>
-              <Badge variant="outline">{palette.length} swatches</Badge>
-            </div>
-            <div
-              className="palette-grid"
-              aria-label={`${palette.length} available colours`}
-            >
-              {palette.map((colour, index) => (
-                <button
-                  key={`${rgbToHex(colour)}-${index}`}
-                  ref={(node) => {
-                    paletteSwatchRefs.current[index] = node;
-                  }}
-                  type="button"
-                  aria-pressed={paintIndex === index}
-                  aria-label={`Palette ${index}, code ${binaryCode(index, bitsPerPixel)}, ${rgbToHex(colour)}`}
-                  title={`${binaryCode(index, bitsPerPixel)} · ${rgbToHex(colour)}`}
-                  className={
-                    paintIndex === index
-                      ? 'palette-swatch palette-swatch-selected'
-                      : 'palette-swatch'
-                  }
-                  style={{ background: rgbToHex(colour) }}
-                  tabIndex={paintIndex === index ? 0 : -1}
-                  onClick={() => {
-                    setPaintIndex(index);
-                    setMode('paint');
-                  }}
-                  onKeyDown={(event) => handlePaletteKeyDown(event, index)}
-                >
-                  {paintIndex === index && <Check />}
-                </button>
-              ))}
-            </div>
-            <p className="palette-help">
-              Choose a swatch, then click or drag across the board. The binary
-              code is a palette index in this teaching model.
-            </p>
-          </div>
-
-          <div className="history-actions">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={undo}
-              disabled={undoStack.length === 0}
-            >
-              <Undo2 /> Undo
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={redo}
-              disabled={redoStack.length === 0}
-            >
-              <Redo2 /> Redo
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={restoreImage}
-              disabled={!isDirty}
-            >
-              <RotateCcw /> Restore image
-            </Button>
-            <Button variant="ghost" size="lg" onClick={resetDemo}>
-              <RefreshCcw /> Reset demo
-            </Button>
-          </div>
-        </aside>
-      </div>
-
-      <p className="sr-only" aria-live="polite">
-        {statusMessage}
-      </p>
-
-      <section className="lesson-section" aria-labelledby="lesson-title">
-        <div className="lesson-header">
-          <div>
-            <p className="section-kicker">Teach with the lab</p>
-            <h2 id="lesson-title">Four ideas, one image</h2>
-          </div>
-          <fieldset className="view-switch">
-            <legend className="sr-only">Lesson view</legend>
-            <Button
-              variant={lessonView === 'guided' ? 'default' : 'outline'}
-              size="lg"
-              onClick={() => setLessonView('guided')}
-            >
-              Guided lesson
-            </Button>
-            <Button
-              variant={lessonView === 'free' ? 'default' : 'outline'}
-              size="lg"
-              onClick={() => setLessonView('free')}
-            >
-              Free explore
-            </Button>
-          </fieldset>
-        </div>
-        {lessonView === 'guided' ? (
-          <div className="guided-lesson">
-            <div
-              className="lesson-steps"
-              role="tablist"
-              aria-label="Guided lesson steps"
-            >
-              {([1, 2, 3, 4] as LessonStep[]).map((step) => (
-                <button
-                  key={step}
-                  ref={(node) => {
-                    lessonTabRefs.current[step - 1] = node;
-                  }}
-                  id={`lesson-tab-${step}`}
-                  role="tab"
-                  aria-controls="lesson-panel"
-                  aria-selected={lessonStep === step}
-                  tabIndex={lessonStep === step ? 0 : -1}
-                  className={
-                    lessonStep === step
-                      ? 'lesson-step lesson-step-active'
-                      : 'lesson-step'
-                  }
-                  onClick={() => setLessonStep(step)}
-                  onKeyDown={(event) => handleLessonKeyDown(event, step)}
-                >
-                  <span>{step}</span>
-                  {
-                    ['Pixel', 'Resolution', 'Colour depth', 'File size'][
-                      step - 1
-                    ]
-                  }
-                </button>
-              ))}
-            </div>
-            <div
-              className="lesson-content"
-              id="lesson-panel"
-              role="tabpanel"
-              aria-labelledby={`lesson-tab-${lessonStep}`}
-            >
-              {lessonStep === 1 && (
-                <>
-                  <div className="lesson-icon">
-                    <Grid3X3 />
-                  </div>
-                  <div>
-                    <p className="section-kicker">Step 1 · Pixel</p>
-                    <h3>Zoom in to the smallest picture element.</h3>
-                    <p>
-                      A pixel is the smallest addressable picture element in a
-                      raster image. In this simulator, one bead represents one
-                      pixel. Select a bead and inspect its coordinate and stored
-                      palette code.
-                    </p>
-                    <Button
-                      size="lg"
-                      onClick={() => {
-                        applyPreset(
-                          16,
-                          16,
-                          3,
-                          'Pixel lesson ready. Select one bead.',
-                        );
-                        setMode('inspect');
-                      }}
-                    >
-                      Set up pixel view <Eye />
-                    </Button>
-                  </div>
-                </>
-              )}
-              {lessonStep === 2 && (
-                <>
-                  <div className="lesson-icon">
-                    <Grid3X3 />
-                  </div>
-                  <div>
-                    <p className="section-kicker">Step 2 · Image resolution</p>
-                    <h3>More pixels can represent more spatial detail.</h3>
-                    <p>
-                      Resolution here means the pixel dimensions: width ×
-                      height. Keep colour depth fixed at 4 bpp, then compare the
-                      two boards. This is not PPI or DPI.
-                    </p>
-                    <div className="lesson-buttons">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={() =>
-                          applyPreset(
-                            8,
-                            8,
-                            4,
-                            'Low-resolution example: 8 × 8 at 4 bpp.',
-                          )
-                        }
-                      >
-                        Low · 8 × 8
-                      </Button>
-                      <Button
-                        size="lg"
-                        onClick={() =>
-                          applyPreset(
-                            48,
-                            48,
-                            4,
-                            'High-resolution example: 48 × 48 at 4 bpp.',
-                          )
-                        }
-                      >
-                        High · 48 × 48
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-              {lessonStep === 3 && (
-                <>
-                  <div className="lesson-icon">
-                    <PaletteIcon />
-                  </div>
-                  <div>
-                    <p className="section-kicker">Step 3 · Colour depth</p>
-                    <h3>Each extra bit doubles the available colours.</h3>
-                    <p>
-                      At a fixed 32 × 32 resolution, compare 1 bpp (up to 2
-                      colours) with 8 bpp (up to 256). Colour depth changes
-                      colour choice—not the number of pixels.
-                    </p>
-                    <div className="lesson-buttons">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={() =>
-                          applyPreset(
-                            32,
-                            32,
-                            1,
-                            'Low colour-depth example: 1 bpp.',
-                          )
-                        }
-                      >
-                        1 bpp · 2 colours
-                      </Button>
-                      <Button
-                        size="lg"
-                        onClick={() =>
-                          applyPreset(
-                            32,
-                            32,
-                            8,
-                            'High colour-depth example: 8 bpp.',
-                          )
-                        }
-                      >
-                        8 bpp · 256 colours
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-              {lessonStep === 4 && (
-                <>
-                  <div className="lesson-icon">
-                    <Binary />
-                  </div>
-                  <div>
-                    <p className="section-kicker">Step 4 · File size</p>
-                    <h3>Pixels × bits per pixel = raw image data.</h3>
-                    <p>
-                      Different choices can produce the same theoretical size:
-                      16 × 16 × 8 bpp and 32 × 32 × 2 bpp both equal 2,048 bits,
-                      or 256 bytes.
-                    </p>
-                    <div className="lesson-buttons">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={() =>
-                          applyPreset(
-                            16,
-                            16,
-                            8,
-                            '256 pixels × 8 bpp = 2,048 bits.',
-                          )
-                        }
-                      >
-                        16² × 8 bpp
-                      </Button>
-                      <Button
-                        size="lg"
-                        onClick={() =>
-                          applyPreset(
-                            32,
-                            32,
-                            2,
-                            '1,024 pixels × 2 bpp = 2,048 bits.',
-                          )
-                        }
-                      >
-                        32² × 2 bpp
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="free-explore-card">
-            <Link2 />
-            <div>
-              <h3>Choose your own test.</h3>
-              <p>
-                Keep one variable fixed, change the other, then use the live
-                metrics and image comparison to explain what happened.
-              </p>
-            </div>
-            <a
-              className={buttonVariants({ variant: 'outline', size: 'lg' })}
-              href="#top"
+            <button
+              type="button"
+              className="dock-colour"
+              style={{ background: rgbToHex(currentPaintColour) }}
+              aria-label={`Current colour ${rgbToHex(currentPaintColour)}`}
               onClick={(event) => {
-                event.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                settingsReturnFocusRef.current = event.currentTarget;
+                setMode('paint');
+                setSettingsOpen(true);
               }}
             >
-              Back to controls
-            </a>
+              <span aria-hidden="true" />
+            </button>
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              onClick={undo}
+              disabled={undoStack.length === 0}
+              aria-label="Undo"
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              ref={settingsTriggerRef}
+              variant="ghost"
+              size="icon-lg"
+              onClick={(event) => {
+                settingsReturnFocusRef.current = event.currentTarget;
+                setSettingsOpen(true);
+              }}
+              aria-label="Open lab settings"
+            >
+              <Settings2 />
+            </Button>
           </div>
+        )}
+
+        {settingsOpen && (
+          <LabDialog
+            className="settings-sheet"
+            labelledBy="settings-title"
+            onDismiss={() => setSettingsOpen(false)}
+            returnFocusRef={settingsReturnFocusRef}
+          >
+            <div className="sheet-handle" aria-hidden="true" />
+            <header className="dialog-header">
+              <div>
+                <p className="section-kicker">Workbench</p>
+                <h2 id="settings-title">Lab settings</h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon-lg"
+                onClick={() => setSettingsOpen(false)}
+                aria-label="Close lab settings"
+              >
+                <X />
+              </Button>
+            </header>
+            <fieldset className="workspace-switch mobile-workspace-switch">
+              <legend className="sr-only">Mobile workspace view</legend>
+              <Button
+                variant={workspaceView === 'explore' ? 'default' : 'outline'}
+                aria-pressed={workspaceView === 'explore'}
+                onClick={() => setWorkspaceView('explore')}
+              >
+                Explore
+              </Button>
+              <Button
+                variant={workspaceView === 'guided' ? 'default' : 'outline'}
+                aria-pressed={workspaceView === 'guided'}
+                onClick={() => setWorkspaceView('guided')}
+              >
+                Guided
+              </Button>
+            </fieldset>
+            <div className="settings-sheet-scroll">
+              {workspaceView === 'explore'
+                ? renderExploreControls('sheet')
+                : renderGuidedRail()}
+            </div>
+          </LabDialog>
+        )}
+
+        {resetConfirmationOpen && (
+          <LabDialog
+            className="reset-dialog"
+            labelledBy="reset-dialog-title"
+            onDismiss={() => setResetConfirmationOpen(false)}
+            returnFocusRef={resetTriggerRef}
+          >
+            <div className="dialog-header">
+              <div>
+                <p className="section-kicker">Edited artwork</p>
+                <h2 id="reset-dialog-title">Reset the whole demo?</h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon-lg"
+                onClick={() => setResetConfirmationOpen(false)}
+                aria-label="Close reset confirmation"
+              >
+                <X />
+              </Button>
+            </div>
+            <p>
+              This clears your paint edits and returns resolution and colour
+              depth to 32 × 32 pixels at 4 bpp.
+            </p>
+            <div className="dialog-actions">
+              <Button
+                variant="outline"
+                onClick={() => setResetConfirmationOpen(false)}
+              >
+                Keep editing
+              </Button>
+              <Button variant="destructive" onClick={performResetDemo}>
+                <RefreshCcw /> Reset demo
+              </Button>
+            </div>
+          </LabDialog>
         )}
       </section>
 
-      <section
-        className="concept-grid"
-        aria-label="Image representation definitions"
-      >
-        <Card>
-          <CardHeader>
-            <span className="concept-number">01</span>
-            <CardTitle>Pixel</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>The smallest addressable picture element in a raster image.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <span className="concept-number">02</span>
-            <CardTitle>Image resolution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>
-              The pixel dimensions of an image. Total pixels = width × height.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <span className="concept-number">03</span>
-            <CardTitle>Colour depth</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>
-              The number of bits used to represent the colour of each pixel.
-              Maximum colours = 2<sup>bpp</sup>.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <span className="concept-number">04</span>
-            <CardTitle>Theoretical size</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Width × height × colour depth gives raw pixel-data bits.</p>
-          </CardContent>
-        </Card>
-      </section>
+      <section className="concept-reference" aria-labelledby="concept-title">
+        <div className="concept-reference-heading">
+          <p className="section-kicker">Concept reference</p>
+          <h2 id="concept-title">The four ideas behind the experiment</h2>
+          <p>
+            Use these definitions when you explain what changed on the
+            workbench.
+          </p>
+        </div>
+        <div
+          className="concept-grid"
+          aria-label="Image representation definitions"
+        >
+          <Card>
+            <CardHeader>
+              <span className="concept-number">01</span>
+              <CardTitle>Pixel</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>The smallest addressable picture element in a raster image.</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <span className="concept-number">02</span>
+              <CardTitle>Image resolution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                The pixel dimensions of an image. Total pixels = width × height.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <span className="concept-number">03</span>
+              <CardTitle>Colour depth</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                The number of bits used for each pixel’s colour. Maximum colours
+                = 2<sup>bpp</sup>.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <span className="concept-number">04</span>
+              <CardTitle>Theoretical size</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Width × height × colour depth gives raw pixel-data bits.</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Alert className="accuracy-note">
-        <Info />
-        <AlertTitle>Exam model versus a real file</AlertTitle>
-        <AlertDescription>
-          This demo calculates theoretical raw, uncompressed pixel data. A real
-          PNG or JPEG also contains headers and metadata, and its actual size is
-          affected by compression, palette storage and transparency. Increasing
-          resolution or colour depth can improve fidelity to the same source,
-          but it cannot recover detail that was never captured.
-        </AlertDescription>
-      </Alert>
+        <Alert className="accuracy-note" role="note">
+          <Info />
+          <AlertTitle>Exam model versus a real file</AlertTitle>
+          <AlertDescription>
+            This demo calculates theoretical raw, uncompressed pixel data. A
+            real PNG or JPEG also contains headers and metadata, and its actual
+            size is affected by compression, palette storage and transparency.
+            Increasing resolution or colour depth can improve fidelity to the
+            same source, but it cannot recover detail that was never captured.
+          </AlertDescription>
+        </Alert>
+      </section>
     </main>
   );
 }

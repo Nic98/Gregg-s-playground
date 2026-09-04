@@ -22,6 +22,11 @@
     "src",
     "lib",
     "tests",
+    "components/ui/alert.tsx",
+    "components/ui/badge.tsx",
+    "components/ui/button.tsx",
+    "components/ui/card.tsx",
+    "components/ui/slider.tsx",
     "playwright.config.ts",
     "vite.config.ts",
     "vitest.config.ts"

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-interactive-element-to-noninteractive-role -- The canvas is deliberately exposed as one keyboard-operated application, not an incomplete grid. */
 import { useCallback, useEffect, useId, useRef } from 'react';
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { RGB } from '@/src/lib/imageMath';
@@ -272,12 +273,12 @@ export function BeadCanvas({
       <canvas
         ref={canvasRef}
         className={`bead-canvas bead-canvas-${mode}`}
-        role="grid"
-        aria-rowcount={height}
-        aria-colcount={width}
+        role="application"
+        aria-roledescription="interactive pixel board"
         tabIndex={0}
         aria-describedby={instructionsId}
         aria-label={`${width} by ${height} interactive bead image. ${mode === 'paint' ? `Paint mode, selected palette colour ${paintIndex}.` : 'Inspect mode.'}`}
+        style={{ touchAction: mode === 'paint' ? 'none' : 'pan-y' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointerStroke}

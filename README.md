@@ -54,6 +54,13 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 
 Shared curriculum navigation and status badges read from the typed syllabus registry, so the catalogue stays consistent as more demonstrations become live.
 
+## Typography licences
+
+The interface self-hosts Bricolage Grotesque Variable and Manrope Variable;
+no font CDN is used. Both fonts are distributed under the SIL Open Font
+License 1.1. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and
+[`LICENSES/OFL-1.1.txt`](LICENSES/OFL-1.1.txt).
+
 ## Image processing used by the simulator
 
 The reference image remains intact on screen. Colour analysis uses the inner crop `(13, 13, 400, 400)` so the white frame does not distort the palette. Transparent pixels are composited onto a fixed background. Every settings change resamples the original crop with area averaging; the result is never generated from an earlier low-resolution board.

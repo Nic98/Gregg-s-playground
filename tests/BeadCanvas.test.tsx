@@ -65,7 +65,7 @@ describe('BeadCanvas', () => {
         onFinishStroke={vi.fn()}
       />,
     );
-    const canvas = getByRole('grid') as HTMLCanvasElement;
+    const canvas = getByRole('application') as HTMLCanvasElement;
     expect(canvas.width).toBe(360);
     expect(canvas.height).toBe(360);
   });
@@ -89,7 +89,7 @@ describe('BeadCanvas', () => {
         onFinishStroke={finish}
       />,
     );
-    const canvas = getByRole('grid');
+    const canvas = getByRole('application');
     fireEvent.pointerDown(canvas, { pointerId: 7, clientX: 5, clientY: 5 });
     fireEvent.pointerMove(canvas, { pointerId: 7, clientX: 115, clientY: 115 });
     fireEvent.pointerUp(canvas, { pointerId: 7, clientX: 115, clientY: 115 });
@@ -118,7 +118,7 @@ describe('BeadCanvas', () => {
         onFinishStroke={vi.fn()}
       />,
     );
-    const canvas = getByRole('grid');
+    const canvas = getByRole('application');
     fireEvent.keyDown(canvas, { key: 'ArrowLeft' });
     expect(select).toHaveBeenLastCalledWith(0);
 
