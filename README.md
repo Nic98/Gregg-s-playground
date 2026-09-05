@@ -4,7 +4,11 @@ An English-language collection of interactive demonstrations for the Cambridge I
 
 **Live site:** [https://nic98.github.io/Gregg-s-playground/](https://nic98.github.io/Gregg-s-playground/)
 
-The first live activity is the **Pixel Bead Simulator** in Topic 1.2, _Text, sound and images_. It uses a Mona Lisa bead image to help learners explore:
+Topic 1.2, _Text, sound and images_, contains three live teacher-led studios:
+
+- **Binary Post Office**: enter a message, trace a character through its code to a binary sequence, flip individual bits and inspect the received text. ASCII and Unicode are the syllabus focus. Windows-1252, UTF-8 and UTF-16LE make the real encoding choices explicit; UTF implementation details are extension material. ASCII shows 7-bit codes separately from typical 8-bit file storage.
+- **Sound Sampling Studio**: inspect regular samples, quantised amplitude levels and binary codes. Compare reference/digital playback, select a sample with arrow keys, or record a three-second clip locally. Blind Listening hides randomised A/B settings until the teacher reveals them. Rate, sample resolution and equal-size trials use the same source, duration, fixed gain and speed. No scoring or persistence.
+- **Pixel Bead Simulator**: uses a Mona Lisa bead image to help learners explore:
 
 - one bead as one pixel;
 - image resolution as pixel dimensions and total pixel count;
@@ -43,13 +47,24 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/` — full syllabus catalogue
 - `#/topics/1-data-representation/1-2-text-sound-images` — Topic 1.2
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
+- `#/topics/1-data-representation/1-2-text-sound-images/binary-post-office` — Binary Post Office
+- `#/topics/1-data-representation/1-2-text-sound-images/sound-sampling-studio` — Sound Sampling Studio
+
+## Teaching sound with a blind comparison
+
+1. Use a comfortable speaker volume. Open **Blind listening**, choose **Sample rate**, play A and B, and ask learners to describe the missing high-frequency detail. Reveal the settings afterwards.
+2. Choose **Sample resolution**. The fading notes make the error from 4-bit quantisation audible; 16-bit audio stays cleaner. This is deliberately a strong contrast, not a promise that all bit depths can be distinguished by ear.
+3. Choose **Same size** to compare `16,000 × 4` with `8,000 × 8`: both use 64,000 bits per second. Discuss the trade-off instead of choosing a universal winner.
+4. Return to Explore and connect what learners heard to sample spacing, amplitude levels and the binary sequence. For mono audio: `sample rate × seconds × bits per sample` gives theoretical raw bits.
+
+Built-in signals are deterministic 48 kHz synthetic clips. Lower-rate versions use a windowed-sinc low-pass filter before sampling; quantisation uses unsigned endpoint-uniform levels with dithering disabled. Playback uses Web Audio at the represented rate, not slowed-down playback. Browser microphone input has already been digitised by hardware, so reprocessing it is an ADC teaching model, not access to an analogue signal. Microphone access requires localhost or HTTPS and explicit permission. Tracks are released on completion, cancellation or navigation. Unsupported/denied microphones leave the built-in examples usable. Blind trials deliberately use the curated built-in sources so the contrast is repeatable.
 
 ## Add a future demonstration
 
 1. Add or update the topic/subsection in `src/data/syllabus.ts`, including its status and route.
 2. Add the new page in `src/pages/`.
 3. Register the route in `src/App.tsx`.
-4. Add its launch card to the relevant subsection page.
+4. For Topic 1.2, add a `studioDemos` registry entry; the launch card and focus-shell routing use it automatically. For other subsections, add a launch card to that subsection page.
 5. Add unit or browser coverage for its important teaching interactions.
 
 Shared curriculum navigation and status badges read from the typed syllabus registry, so the catalogue stays consistent as more demonstrations become live.

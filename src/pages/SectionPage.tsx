@@ -2,31 +2,17 @@ import { useEffect } from 'react';
 import { ArrowRight, FileText, Image as ImageIcon, Music2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { ComingSoonBadge, LiveBadge } from '@/src/components/AppShell';
+import { LiveBadge } from '@/src/components/AppShell';
 import { PageHeader } from '@/src/components/PageHeader';
 import { PixelMark } from '@/src/components/PixelMark';
-import { simulatorRoute } from '@/src/data/syllabus';
+import { studioDemos } from '@/src/data/syllabus';
+import '../studio.css';
 
-const plannedModules = [
-  {
-    title: 'Text',
-    description: 'Character sets, ASCII, Unicode and bits per character.',
-    icon: FileText,
-    accent: 'coral',
-  },
-  {
-    title: 'Sound',
-    description: 'Sample rate, sample resolution, accuracy and file size.',
-    icon: Music2,
-    accent: 'violet',
-  },
-] as const;
-
+const icons = { text: FileText, sound: Music2, image: ImageIcon };
 export function SectionPage() {
   useEffect(() => {
     document.title = '1.2 Text, sound and images · Gregg’s Playground';
   }, []);
-
   return (
     <main className="page-wrap section-page">
       <PageHeader
@@ -39,86 +25,96 @@ export function SectionPage() {
           </>
         }
         title="Text, sound and images"
-        description="Computers represent every kind of media as binary. Choose a studio to explore how that conversion works and why each setting matters."
+        description="Three studios. One idea: everything becomes binary. Follow a character, sample a sound, or build an image — then change one thing and explain what happens."
         breadcrumbs={[
           { label: 'Topic 1 · Data representation' },
           { label: '1.2 Text, sound and images' },
         ]}
       />
-
-      <section
-        className="module-grid module-bento"
-        aria-label="Topic 1.2 studios"
-      >
-        <Link
-          to={simulatorRoute}
-          className="module-card module-card-live module-feature-link"
-          aria-label="Open lab: Open Pixel Bead Simulator"
-        >
-          <div className="module-feature-link__heading">
-            <span className="module-icon module-icon--images">
-              <ImageIcon aria-hidden="true" />
-            </span>
-            <LiveBadge />
-          </div>
-
-          <div className="module-feature-link__copy">
-            <p className="section-kicker">Image representation</p>
-            <h2>See an image become data.</h2>
-            <p>
-              Rebuild a familiar portrait bead by bead. Compare the source with
-              its bitmap while resolution, colour depth and raw size update in
-              real time.
-            </p>
-            <ul className="module-knowledge-tags" aria-label="Concepts covered">
-              <li>Pixels</li>
-              <li>Resolution</li>
-              <li>Colour depth</li>
-            </ul>
-          </div>
-
-          <figure className="module-feature-link__preview">
-            <img
-              src={`${import.meta.env.BASE_URL}assets/mona-lisa-beads.png`}
-              alt="Mona Lisa rendered as a grid of coloured beads"
-            />
-            <figcaption>
-              <span>Pixel Bead Simulator</span>
-              <strong>32 × 32 · 4 bpp</strong>
-            </figcaption>
-          </figure>
-
-          <span className="module-feature-link__cta">
-            Open Pixel Bead Simulator <ArrowRight aria-hidden="true" />
-          </span>
-        </Link>
-
-        <div className="module-bento__planned">
-          {plannedModules.map((module) => (
-            <article
-              className={`module-card module-planned-card module-planned-card--${module.accent}`}
-              key={module.title}
+      <section className="chapter-studios" aria-label="Topic 1.2 studios">
+        {studioDemos.map((demo) => {
+          const Icon = icons[demo.id];
+          return (
+            <Link
+              key={demo.id}
+              to={demo.route}
+              className={`chapter-studio chapter-studio--${demo.id}`}
+              aria-label={`Open lab: Open ${demo.title}`}
             >
-              <div className="module-planned-card__heading">
-                <span className="module-icon">
-                  <module.icon aria-hidden="true" />
-                </span>
-                <ComingSoonBadge />
+              <div className="studio-row">
+                <Icon size={24} />
+                <LiveBadge />
               </div>
-              <div className="module-planned-card__copy">
-                <h2>{module.title}</h2>
-                <p>{module.description}</p>
+              <div className="chapter-preview" aria-hidden="true">
+                {demo.id === 'text' ? (
+                  <>
+                    <strong>A → 65</strong>
+                    <code>1 0 0 0 0 0 1</code>
+                  </>
+                ) : demo.id === 'sound' ? (
+                  <>
+                    <svg viewBox="0 0 300 100">
+                      <path
+                        d={Array.from(
+                          { length: 101 },
+                          (_, i) =>
+                            `${i ? 'L' : 'M'}${i * 3},${50 + Math.sin(i * 0.2) * 32}`,
+                        ).join(' ')}
+                        fill="none"
+                        stroke="#5949cc"
+                        strokeWidth="3"
+                      />
+                      {Array.from({ length: 21 }, (_, i) => (
+                        <g key={i}>
+                          <line
+                            x1={i * 15}
+                            x2={i * 15}
+                            y1="50"
+                            y2={50 + Math.sin(i) * 32}
+                            stroke="#5949cc"
+                          />
+                          <circle
+                            cx={i * 15}
+                            cy={50 + Math.sin(i) * 32}
+                            r="4"
+                            fill="#11140f"
+                          />
+                        </g>
+                      ))}
+                    </svg>
+                    <code>WAVE → SAMPLE → BITS</code>
+                  </>
+                ) : (
+                  <img
+                    src={`${import.meta.env.BASE_URL}assets/mona-lisa-beads.png`}
+                    alt=""
+                  />
+                )}
               </div>
-            </article>
-          ))}
-        </div>
+              <h2>{demo.title}</h2>
+              <p>{demo.description}</p>
+              <ul
+                className="module-knowledge-tags"
+                aria-label="Concepts covered"
+              >
+                {demo.concepts.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+              <span className="chapter-studio-cta">
+                Open lab
+                <ArrowRight size={18} />
+              </span>
+            </Link>
+          );
+        })}
       </section>
-
       <aside className="exam-language-card" aria-labelledby="exam-ready-title">
         <span id="exam-ready-title">Exam-ready idea</span>
         <p>
-          An image is a series of pixels converted into binary so it can be
-          processed by a computer.
+          Computers represent text, sound and images as binary. The
+          representation determines what can be stored, its accuracy and how
+          much data is needed.
         </p>
       </aside>
     </main>

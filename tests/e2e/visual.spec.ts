@@ -23,7 +23,7 @@ test('catalogue visual baseline', async ({ page }) => {
 test('Topic 1.2 visual baseline', async ({ page }) => {
   await page.goto(`./${sectionHash}`);
   await ready(page);
-  await expect(page.locator('.module-feature-link img')).toBeVisible();
+  await expect(page.locator('.chapter-studio--image img')).toBeVisible();
   await expect(page).toHaveScreenshot('topic-1-2-1366x768.png', {
     animations: 'disabled',
     caret: 'hide',
@@ -82,4 +82,36 @@ test('button visual states remain intentional', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Restore image' }),
   ).toHaveScreenshot('button-disabled.png', { maxDiffPixelRatio: 0.08 });
+});
+
+for (const studio of ['binary-post-office', 'sound-sampling-studio']) {
+  test(`${studio} desktop visual baseline`, async ({ page }) => {
+    await page.goto(`./${sectionHash}/${studio}`);
+    await ready(page);
+    await expect(page.locator('.studio-stage')).toBeVisible();
+    await expect(page).toHaveScreenshot(`${studio}-1366x768.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.01,
+    });
+  });
+  test(`${studio} touch visual baseline`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`./${sectionHash}/${studio}`);
+    await ready(page);
+    await expect(page).toHaveScreenshot(`${studio}-390x844.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.01,
+    });
+  });
+}
+test('blind listening hides visual cues baseline', async ({ page }) => {
+  await page.goto(`./${sectionHash}/sound-sampling-studio`);
+  await ready(page);
+  await page
+    .getByRole('button', { name: 'Blind listening', exact: true })
+    .click();
+  await expect(page).toHaveScreenshot('blind-listening-1366x768.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
 });

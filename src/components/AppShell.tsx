@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { PixelMark } from '@/src/components/PixelMark';
 import {
   sectionRoute,
-  simulatorRoute,
+  studioDemos,
   syllabus,
   type SyllabusTopic,
 } from '@/src/data/syllabus';
@@ -41,8 +41,10 @@ export function useAppShell(): AppShellContextValue {
 function getShellMode(pathname: string): ShellMode {
   if (pathname === '/') return 'catalogue';
   if (
-    pathname === simulatorRoute ||
-    pathname.startsWith(`${simulatorRoute}/`)
+    studioDemos.some(
+      (demo) =>
+        pathname === demo.route || pathname.startsWith(`${demo.route}/`),
+    )
   ) {
     return 'lab';
   }

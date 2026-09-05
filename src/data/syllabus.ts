@@ -18,6 +18,50 @@ export const sectionRoute =
   '/topics/1-data-representation/1-2-text-sound-images';
 
 export const simulatorRoute = `${sectionRoute}/pixel-bead-simulator`;
+export const textStudioRoute = `${sectionRoute}/binary-post-office`;
+export const soundStudioRoute = `${sectionRoute}/sound-sampling-studio`;
+
+export interface StudioDemo {
+  id: 'text' | 'sound' | 'image';
+  title: string;
+  category: string;
+  status: ContentStatus;
+  route: string;
+  description: string;
+  concepts: string[];
+}
+export const studioDemos: StudioDemo[] = [
+  {
+    id: 'text',
+    title: 'Binary Post Office',
+    category: 'Text representation',
+    status: 'live',
+    route: textStudioRoute,
+    description:
+      'Stamp a message into binary. Follow each character through its code, then flip a bit and see what arrives.',
+    concepts: ['Character sets', 'ASCII', 'Unicode'],
+  },
+  {
+    id: 'sound',
+    title: 'Sound Sampling Studio',
+    category: 'Sound representation',
+    status: 'live',
+    route: soundStudioRoute,
+    description:
+      'Turn a wave into sample codes. Hear what changes with rate and resolution, then try a blind A/B comparison.',
+    concepts: ['Sample rate', 'Sample resolution', 'Binary'],
+  },
+  {
+    id: 'image',
+    title: 'Pixel Bead Simulator',
+    category: 'Image representation',
+    status: 'live',
+    route: simulatorRoute,
+    description:
+      'Rebuild a familiar portrait bead by bead. Explore how resolution and colour depth change the image and its raw size.',
+    concepts: ['Pixels', 'Resolution', 'Colour depth'],
+  },
+];
 
 export const syllabus: SyllabusTopic[] = [
   {
