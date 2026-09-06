@@ -22,8 +22,10 @@ export const textStudioRoute = `${sectionRoute}/binary-post-office`;
 export const soundStudioRoute = `${sectionRoute}/sound-sampling-studio`;
 export const utf16KeyboardRoute = `${sectionRoute}/utf16-keyboard`;
 
+export const soundJourneyRoute = `${sectionRoute}/how-sound-becomes-binary`;
+
 export interface StudioDemo {
-  id: 'text' | 'sound' | 'image' | 'utf16';
+  id: 'text' | 'sound' | 'image' | 'utf16' | 'sound-journey';
   title: string;
   category: string;
   status: ContentStatus;
@@ -32,6 +34,16 @@ export interface StudioDemo {
   concepts: string[];
 }
 export const studioDemos: StudioDemo[] = [
+  {
+    id: 'sound-journey',
+    title: 'How sound becomes binary',
+    category: 'Sound representation',
+    status: 'live',
+    route: soundJourneyRoute,
+    description:
+      'Follow one signal through capture, sampling, quantisation and encoding. Step through the process and trace each sample into binary.',
+    concepts: ['8 Hz', '4 bits per sample', 'Analogue to digital'],
+  },
   {
     id: 'utf16',
     title: 'UTF-16 Keyboard',

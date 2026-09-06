@@ -17,6 +17,7 @@ import '../studio.css';
 const icons = {
   text: FileText,
   sound: Music2,
+  'sound-journey': Music2,
   image: ImageIcon,
   utf16: Keyboard,
 };
@@ -36,7 +37,7 @@ export function SectionPage() {
           </>
         }
         title="Text, sound and images"
-        description="Four studios. One idea: everything becomes binary. Type a character, sample a sound, or build an image — then change one thing and explain what happens."
+        description="One idea: everything becomes binary. Type a character, sample a sound, or build an image — then change one thing and explain what happens."
         breadcrumbs={[
           { label: 'Topic 1 · Data representation' },
           { label: '1.2 Text, sound and images' },
@@ -70,7 +71,7 @@ export function SectionPage() {
                     <strong>A → 65</strong>
                     <code>1 0 0 0 0 0 1</code>
                   </>
-                ) : demo.id === 'sound' ? (
+                ) : demo.id === 'sound' || demo.id === 'sound-journey' ? (
                   <>
                     <svg viewBox="0 0 300 100">
                       <path

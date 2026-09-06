@@ -4,7 +4,9 @@ An English-language collection of interactive demonstrations for the Cambridge I
 
 **Live site:** [https://nic98.github.io/Gregg-s-playground/](https://nic98.github.io/Gregg-s-playground/)
 
-Topic 1.2, _Text, sound and images_, contains four live teacher-led studios:
+Topic 1.2, _Text, sound and images_, contains five live teacher-led studios:
+
+- **How sound becomes binary**: a projector-friendly four-stage demo with fixed 8 Hz sampling and 4 bits per sample. Step through Capture, Sample, Quantise and Encode, auto-play the stages, and select a sample to trace its measurement into a binary code. The default example is `7.8 → 8 → 1000`. Capture hides all ticks and grids, Sample introduces time guides, and Quantise adds the 16 amplitude levels.
 
 - **UTF-16 Keyboard**: type hex code units using a large keypad or physical keyboard, preview Chinese characters, and press Enter to compose a message. Includes 27 lookup entries and five practice phrases. Start with `8F93 → 输`, then try `4F60 597D 4E16 754C → 你好世界`. Surrogate pairs such as `D83D DE00 → 😀` are an explicit extension; the lab never claims all characters use only 16 bits. This is an in-page teaching keyboard, not an installed system input method.
 
@@ -51,6 +53,7 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
 - `#/topics/1-data-representation/1-2-text-sound-images/binary-post-office` — Binary Post Office
 - `#/topics/1-data-representation/1-2-text-sound-images/sound-sampling-studio` — Sound Sampling Studio
+- `#/topics/1-data-representation/1-2-text-sound-images/how-sound-becomes-binary` — How sound becomes binary
 - `#/topics/1-data-representation/1-2-text-sound-images/utf16-keyboard` — UTF-16 Keyboard
 
 ## Teaching sound with a blind comparison

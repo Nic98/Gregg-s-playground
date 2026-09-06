@@ -56,7 +56,11 @@ export function StudioLayout({
             <span>Topic 1.2</span>
           </Link>
           <h1>{title}</h1>
-          <Button variant="outline" onClick={toggleFullscreen}>
+          <Button
+            variant="outline"
+            onClick={toggleFullscreen}
+            aria-label={full ? 'Exit fullscreen' : 'Fullscreen'}
+          >
             {full ? <Minimize /> : <Maximize />}
             <span className="fullscreen-label">
               {full ? 'Exit fullscreen' : 'Fullscreen'}
