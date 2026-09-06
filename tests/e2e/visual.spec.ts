@@ -84,11 +84,19 @@ test('button visual states remain intentional', async ({ page }) => {
   ).toHaveScreenshot('button-disabled.png', { maxDiffPixelRatio: 0.08 });
 });
 
-for (const studio of ['binary-post-office', 'sound-sampling-studio']) {
+for (const studio of [
+  'binary-post-office',
+  'sound-sampling-studio',
+  'utf16-keyboard',
+]) {
   test(`${studio} desktop visual baseline`, async ({ page }) => {
     await page.goto(`./${sectionHash}/${studio}`);
     await ready(page);
-    await expect(page.locator('.studio-stage')).toBeVisible();
+    await expect(
+      page.locator(
+        studio === 'utf16-keyboard' ? '.utf-keyboard' : '.studio-stage',
+      ),
+    ).toBeVisible();
     await expect(page).toHaveScreenshot(`${studio}-1366x768.png`, {
       animations: 'disabled',
       maxDiffPixelRatio: 0.01,

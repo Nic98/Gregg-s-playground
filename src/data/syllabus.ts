@@ -20,9 +20,10 @@ export const sectionRoute =
 export const simulatorRoute = `${sectionRoute}/pixel-bead-simulator`;
 export const textStudioRoute = `${sectionRoute}/binary-post-office`;
 export const soundStudioRoute = `${sectionRoute}/sound-sampling-studio`;
+export const utf16KeyboardRoute = `${sectionRoute}/utf16-keyboard`;
 
 export interface StudioDemo {
-  id: 'text' | 'sound' | 'image';
+  id: 'text' | 'sound' | 'image' | 'utf16';
   title: string;
   category: string;
   status: ContentStatus;
@@ -31,6 +32,16 @@ export interface StudioDemo {
   concepts: string[];
 }
 export const studioDemos: StudioDemo[] = [
+  {
+    id: 'utf16',
+    title: 'UTF-16 Keyboard',
+    category: 'Text representation',
+    status: 'live',
+    route: utf16KeyboardRoute,
+    description:
+      'Type Chinese characters using hexadecimal codes. Explore a character table, build a message and try whole phrases.',
+    concepts: ['Unicode', 'Hexadecimal', 'UTF-16'],
+  },
   {
     id: 'text',
     title: 'Binary Post Office',

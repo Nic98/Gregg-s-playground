@@ -4,7 +4,9 @@ An English-language collection of interactive demonstrations for the Cambridge I
 
 **Live site:** [https://nic98.github.io/Gregg-s-playground/](https://nic98.github.io/Gregg-s-playground/)
 
-Topic 1.2, _Text, sound and images_, contains three live teacher-led studios:
+Topic 1.2, _Text, sound and images_, contains four live teacher-led studios:
+
+- **UTF-16 Keyboard**: type hex code units using a large keypad or physical keyboard, preview Chinese characters, and press Enter to compose a message. Includes 27 lookup entries and five practice phrases. Start with `8F93 → 输`, then try `4F60 597D 4E16 754C → 你好世界`. Surrogate pairs such as `D83D DE00 → 😀` are an explicit extension; the lab never claims all characters use only 16 bits. This is an in-page teaching keyboard, not an installed system input method.
 
 - **Binary Post Office**: enter a message, trace a character through its code to a binary sequence, flip individual bits and inspect the received text. ASCII and Unicode are the syllabus focus. Windows-1252, UTF-8 and UTF-16LE make the real encoding choices explicit; UTF implementation details are extension material. ASCII shows 7-bit codes separately from typical 8-bit file storage.
 - **Sound Sampling Studio**: inspect regular samples, quantised amplitude levels and binary codes. Compare reference/digital playback, select a sample with arrow keys, or record a three-second clip locally. Blind Listening hides randomised A/B settings until the teacher reveals them. Rate, sample resolution and equal-size trials use the same source, duration, fixed gain and speed. No scoring or persistence.
@@ -49,6 +51,7 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
 - `#/topics/1-data-representation/1-2-text-sound-images/binary-post-office` — Binary Post Office
 - `#/topics/1-data-representation/1-2-text-sound-images/sound-sampling-studio` — Sound Sampling Studio
+- `#/topics/1-data-representation/1-2-text-sound-images/utf16-keyboard` — UTF-16 Keyboard
 
 ## Teaching sound with a blind comparison
 

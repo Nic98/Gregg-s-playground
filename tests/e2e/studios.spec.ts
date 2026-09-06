@@ -68,9 +68,9 @@ test.describe('microphone lifecycle with a virtual microphone', () => {
   });
 });
 
-test('all three studios launch from the chapter registry', async ({ page }) => {
+test('all four studios launch from the chapter registry', async ({ page }) => {
   await page.goto(`./${section}`);
-  await expect(page.locator('.chapter-studio')).toHaveCount(3);
+  await expect(page.locator('.chapter-studio')).toHaveCount(4);
   await page
     .getByRole('link', { name: 'Open lab: Open Binary Post Office' })
     .click();

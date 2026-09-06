@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { ArrowRight, FileText, Image as ImageIcon, Music2 } from 'lucide-react';
+import {
+  ArrowRight,
+  FileText,
+  Image as ImageIcon,
+  Music2,
+  Keyboard,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { LiveBadge } from '@/src/components/AppShell';
@@ -8,7 +14,12 @@ import { PixelMark } from '@/src/components/PixelMark';
 import { studioDemos } from '@/src/data/syllabus';
 import '../studio.css';
 
-const icons = { text: FileText, sound: Music2, image: ImageIcon };
+const icons = {
+  text: FileText,
+  sound: Music2,
+  image: ImageIcon,
+  utf16: Keyboard,
+};
 export function SectionPage() {
   useEffect(() => {
     document.title = '1.2 Text, sound and images · Gregg’s Playground';
@@ -25,13 +36,16 @@ export function SectionPage() {
           </>
         }
         title="Text, sound and images"
-        description="Three studios. One idea: everything becomes binary. Follow a character, sample a sound, or build an image — then change one thing and explain what happens."
+        description="Four studios. One idea: everything becomes binary. Type a character, sample a sound, or build an image — then change one thing and explain what happens."
         breadcrumbs={[
           { label: 'Topic 1 · Data representation' },
           { label: '1.2 Text, sound and images' },
         ]}
       />
-      <section className="chapter-studios" aria-label="Topic 1.2 studios">
+      <section
+        className="chapter-studios chapter-studios--four"
+        aria-label="Topic 1.2 studios"
+      >
         {studioDemos.map((demo) => {
           const Icon = icons[demo.id];
           return (
@@ -46,7 +60,12 @@ export function SectionPage() {
                 <LiveBadge />
               </div>
               <div className="chapter-preview" aria-hidden="true">
-                {demo.id === 'text' ? (
+                {demo.id === 'utf16' ? (
+                  <>
+                    <strong lang="zh">8F93 → 输</strong>
+                    <code>HEX → UTF-16 → TEXT</code>
+                  </>
+                ) : demo.id === 'text' ? (
                   <>
                     <strong>A → 65</strong>
                     <code>1 0 0 0 0 0 1</code>
