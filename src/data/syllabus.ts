@@ -23,9 +23,10 @@ export const soundStudioRoute = `${sectionRoute}/sound-sampling-studio`;
 export const utf16KeyboardRoute = `${sectionRoute}/utf16-keyboard`;
 
 export const soundJourneyRoute = `${sectionRoute}/how-sound-becomes-binary`;
+export const imageJourneyRoute = `${sectionRoute}/how-image-becomes-binary`;
 
 export interface StudioDemo {
-  id: 'text' | 'sound' | 'image' | 'utf16' | 'sound-journey';
+  id: 'text' | 'sound' | 'image' | 'utf16' | 'sound-journey' | 'image-journey';
   title: string;
   category: string;
   status: ContentStatus;
@@ -34,6 +35,16 @@ export interface StudioDemo {
   concepts: string[];
 }
 export const studioDemos: StudioDemo[] = [
+  {
+    id: 'image-journey',
+    title: 'How an image becomes binary',
+    category: 'Image representation',
+    status: 'live',
+    route: imageJourneyRoute,
+    description:
+      'Count the pixels, look up each colour code, then scan row by row to build a binary sequence. One image, four clear stages.',
+    concepts: ['Pixels', 'Colour codes', 'Storage order'],
+  },
   {
     id: 'sound-journey',
     title: 'How sound becomes binary',

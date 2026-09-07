@@ -18,6 +18,7 @@ const icons = {
   text: FileText,
   sound: Music2,
   'sound-journey': Music2,
+  'image-journey': ImageIcon,
   image: ImageIcon,
   utf16: Keyboard,
 };
@@ -61,7 +62,12 @@ export function SectionPage() {
                 <LiveBadge />
               </div>
               <div className="chapter-preview" aria-hidden="true">
-                {demo.id === 'utf16' ? (
+                {demo.id === 'image-journey' ? (
+                  <>
+                    <strong>16 pixels</strong>
+                    <code>00 01 10 11 → BINARY</code>
+                  </>
+                ) : demo.id === 'utf16' ? (
                   <>
                     <strong lang="zh">8F93 → 输</strong>
                     <code>HEX → UTF-16 → TEXT</code>

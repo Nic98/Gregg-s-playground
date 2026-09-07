@@ -14,7 +14,7 @@ export function StudioLayout({
   showSettings = true,
 }: {
   title: string;
-  kind: 'text' | 'sound';
+  kind: 'text' | 'sound' | 'image';
   children: ReactNode;
   reference: ReactNode;
   showSettings?: boolean;

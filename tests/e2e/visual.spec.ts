@@ -123,3 +123,21 @@ test('blind listening hides visual cues baseline', async ({ page }) => {
     maxDiffPixelRatio: 0.01,
   });
 });
+
+for (const view of ['pixels', 'sequence', 'mobile'] as const) {
+  test(`image journey ${view} visual baseline`, async ({ page }) => {
+    if (view === 'mobile')
+      await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`./${sectionHash}/how-image-becomes-binary`);
+    await ready(page);
+    if (view === 'sequence') {
+      await page.getByRole('button', { name: '04 Sequence' }).click();
+      await page.getByRole('button', { name: 'Show all', exact: true }).click();
+    }
+    await expect(page.locator('.image-pixel-board')).toBeVisible();
+    await expect(page).toHaveScreenshot(`image-journey-${view}.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.01,
+    });
+  });
+}

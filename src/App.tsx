@@ -9,6 +9,7 @@ import {
   textStudioRoute,
   soundStudioRoute,
   soundJourneyRoute,
+  imageJourneyRoute,
   utf16KeyboardRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
@@ -16,6 +17,7 @@ import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
 import { Utf16KeyboardPage } from '@/src/pages/Utf16KeyboardPage';
 
 import { SoundJourneyPage } from '@/src/pages/SoundJourneyPage';
+import { ImageJourneyPage } from '@/src/pages/ImageJourneyPage';
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path={simulatorRoute} element={<SimulatorPage />} />
         <Route path={textStudioRoute} element={<TextStudioPage />} />
         <Route path={soundJourneyRoute} element={<SoundJourneyPage />} />
+        <Route path={imageJourneyRoute} element={<ImageJourneyPage />} />
         <Route path={soundStudioRoute} element={<SoundStudioPage />} />
         <Route path={utf16KeyboardRoute} element={<Utf16KeyboardPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

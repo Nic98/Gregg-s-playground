@@ -4,7 +4,9 @@ An English-language collection of interactive demonstrations for the Cambridge I
 
 **Live site:** [https://nic98.github.io/Gregg-s-playground/](https://nic98.github.io/Gregg-s-playground/)
 
-Topic 1.2, _Text, sound and images_, contains five live teacher-led studios:
+Topic 1.2, _Text, sound and images_, contains six live teacher-led studios:
+
+- **How an image becomes binary**: reveal Pixels, Resolution, Colour codes and Sequence in four stages. Change width and height independently, compare 1–3 bits per pixel, and scan a small bitmap from left to right, top to bottom. Select a pixel or its sequence code to trace the connection. The default `4 × 4 × 2` example stores 32 raw bits (4 bytes). Same-colour pixels share a code. The palette is an indexed-colour teaching model; real formats can store RGB values and include compression and file structures.
 
 - **How sound becomes binary**: a projector-friendly four-stage demo with fixed 8 Hz sampling and 4 bits per sample. Step through Capture, Sample, Quantise and Encode, auto-play the stages, and select a sample to trace its measurement into a binary code. The default example is `7.8 → 8 → 1000`. Capture hides all ticks and grids, Sample introduces time guides, and Quantise adds the 16 amplitude levels.
 
@@ -50,6 +52,7 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 
 - `#/` — full syllabus catalogue
 - `#/topics/1-data-representation/1-2-text-sound-images` — Topic 1.2
+- `#/topics/1-data-representation/1-2-text-sound-images/how-image-becomes-binary` — How an image becomes binary
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
 - `#/topics/1-data-representation/1-2-text-sound-images/binary-post-office` — Binary Post Office
 - `#/topics/1-data-representation/1-2-text-sound-images/sound-sampling-studio` — Sound Sampling Studio
