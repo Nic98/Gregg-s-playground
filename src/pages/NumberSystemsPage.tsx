@@ -17,7 +17,7 @@ export function NumberSystemsPage() {
         variant="section"
         eyebrow="0478 / 1.1 · Data representation"
         title="Number systems"
-        description="Same value. Different notation. Explore where hexadecimal appears and why people use it to work with binary data."
+        description="Explore hexadecimal. Pick a demo."
         breadcrumbs={[
           { label: 'Topic 1 · Data representation' },
           { label: '1.1 Number systems' },
@@ -48,25 +48,12 @@ export function NumberSystemsPage() {
             </div>
             <h2>{demo.title}</h2>
             <p>{demo.description}</p>
-            <ul className="module-knowledge-tags">
-              {demo.concepts.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
             <span className="chapter-studio-cta">
               Open lab <ArrowRight size={18} />
             </span>
           </Link>
         ))}
       </section>
-      <aside className="exam-language-card">
-        <span>Exam-ready idea</span>
-        <p>
-          Hexadecimal is base 16: digits 0–9 and A–F. Each hexadecimal digit
-          corresponds to exactly four binary digits. A shorter representation
-          does not mean less underlying data.
-        </p>
-      </aside>
     </main>
   );
 }

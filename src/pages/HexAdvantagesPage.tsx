@@ -6,6 +6,7 @@ import {
   HexInspector,
   HexNavigation,
   HexReference,
+  HexNotes,
 } from '../components/HexWorkbench';
 import { divisionByTwo, hexToBinary, screenCapacity } from '../lib/hexadecimal';
 import '../hex.css';
@@ -43,12 +44,7 @@ function SpaceExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">01 / Save screen space</p>
-        <h2>Keep the value. Shorten the notation.</h2>
-        <p>
-          Switch the display format. The characters use the same font and size,
-          so you can compare the space they need.
-        </p>
+        <h2>32 digits → 8 digits.</h2>
         <NotationSwitch hex={hex} onChange={setHex} />
         <div className="hex-terminal hex-space-screen">
           <span>ONE 32-BIT VALUE</span>
@@ -63,7 +59,7 @@ function SpaceExperiment() {
           </div>
           <div>
             <strong>32 bits</strong>
-            <span>underlying value in either notation</span>
+            <span>same data</span>
           </div>
         </div>
         <label className="hex-select-label">
@@ -76,20 +72,29 @@ function SpaceExperiment() {
         </label>
       </section>
       <aside className="hex-panel">
-        <h3>Four become one</h3>
         <HexInspector value={value} />
-        <div className="hex-callout">
-          <strong>8 instead of 32 digits</strong>
-          <p>
-            Hex uses one quarter as many digits as binary: 75% fewer displayed
-            digits here, excluding prefixes and spaces.
-          </p>
+        <div
+          className="hex-length-comparison"
+          aria-label="Binary uses 32 digits; hexadecimal uses 8"
+        >
+          <div>
+            <span>Binary · 32</span>
+            <i />
+          </div>
+          <div>
+            <span>Hex · 8</span>
+            <i />
+          </div>
         </div>
-        <p className="hex-note">
-          This saves display space, not memory for the underlying 32-bit value.
-          Both representations describe the same data. Storing the written
-          digits as a text file would be a separate encoding question.
-        </p>
+        <div className="hex-mini-equation">75% fewer digits · same 32 bits</div>
+        <HexNotes>
+          <p>
+            This saves display space, not memory for the underlying 32-bit
+            value. Both representations describe the same data. Storing the
+            written digits as a text file would be a separate encoding question.
+          </p>
+          <p>Display counts exclude prefixes and spaces.</p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -111,14 +116,10 @@ function ReadabilityExperiment() {
     .toUpperCase();
   const good = answer === item.position;
   return (
-    <div className="hex-experiment-grid">
+    <div className="hex-experiment-grid hex-experiment-grid--solo">
       <section className="hex-panel">
-        <p className="studio-kicker">02 / Read, compare, debug</p>
         <h2>Find the copying error.</h2>
-        <p>
-          One bit was copied incorrectly. Compare the expected value with the
-          received value, then select the mismatching group below.
-        </p>
+        <p>One bit changed. Tap the mismatch.</p>
         <NotationSwitch
           hex={hex}
           onChange={(next) => {
@@ -169,26 +170,17 @@ function ReadabilityExperiment() {
           </Button>
         </div>
       </section>
-      <aside className="hex-panel">
-        <h3>Less to read. Less to copy.</h3>
+      <HexNotes>
         <p>
           Eight hex digits replace thirty-two binary digits. Shorter codes are
           usually easier for humans to read, compare and report, helping reduce
           transcription mistakes and making debugging easier.
         </p>
-        <div className="hex-callout">
-          <strong>Notation helps the human.</strong>
-          <p>
-            The mismatch exists in both displays. Hexadecimal does not detect or
-            correct errors automatically.
-          </p>
-        </div>
-        <p className="hex-note">
-          Try the same example in each notation. Discuss which is easier to
-          inspect; this is a classroom comparison, not a timed or scientific
-          test of reading speed.
+        <p>
+          The mismatch exists in both displays. Hexadecimal does not detect or
+          correct errors automatically.
         </p>
-      </aside>
+      </HexNotes>
     </div>
   );
 }
@@ -220,12 +212,7 @@ function CapacityExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">03 / Smaller displays, more information</p>
-        <h2>How much fits on this screen?</h2>
-        <p>
-          This display has two rows of fixed-width character slots. Every stored
-          value is 16 bits; leading zeros are kept.
-        </p>
+        <h2>Same screen. More values.</h2>
         <NotationSwitch hex={hex} onChange={setHex} />
         <label className="hex-select-label">
           Screen width
@@ -263,31 +250,37 @@ function CapacityExperiment() {
           </div>
           <div>
             <strong>{count * 16} bits</strong>
-            <span>represented by the visible values</span>
+            <span>visible data · 16 bits per value</span>
           </div>
         </div>
       </section>
       <aside className="hex-panel">
-        <h3>Two ways to use the saved space</h3>
-        <div className="hex-callout">
-          <strong>Same screen → more information</strong>
-          <p>
-            {capacity.binary} binary values or {capacity.hex} hex values fit in
-            this screen.
-          </p>
+        <h3>{slots} slots</h3>
+        <div className="hex-capacity-comparison">
+          <div>
+            <span>Binary</span>
+            <strong>{capacity.binary}</strong>
+            <span>values</span>
+          </div>
+          <ArrowRight />
+          <div>
+            <span>Hex</span>
+            <strong>{capacity.hex}</strong>
+            <span>values</span>
+          </div>
         </div>
-        <div className="hex-callout">
-          <strong>Same information → smaller display</strong>
+        <div className="hex-mini-equation">4× as many values</div>
+        <HexNotes>
           <p>
-            Two 16-bit values need 32 binary digits, but only 8 hex digits. They
-            can fit in fewer character slots at the same text size.
+            Same data, smaller display: two 16-bit values need 32 binary digits,
+            but only 8 hex digits.
           </p>
-        </div>
-        <p className="hex-note">
-          The bands distinguish values without using separator characters. These
-          counts exclude labels, punctuation and spacing. Actual screen
-          dimensions also depend on font size and layout.
-        </p>
+          <p>
+            The bands distinguish values without using separator characters.
+            These counts exclude labels, punctuation and spacing. Actual screen
+            dimensions also depend on font size and layout.
+          </p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -305,12 +298,7 @@ function ConversionExperiment() {
     <>
       <div className="hex-conversion-heading">
         <div>
-          <p className="studio-kicker">04 / Easier conversion to binary</p>
-          <h2>Map each digit. Join the four-bit groups.</h2>
-          <p>
-            16 = 2⁴, so each hex digit maps directly to four bits. Denary digits
-            do not have this one-to-four relationship.
-          </p>
+          <h2>Two routes. Same binary.</h2>
         </div>
         <form
           className="hex-entry"
@@ -348,7 +336,6 @@ function ConversionExperiment() {
       <div className="hex-conversion-grid">
         <section className="hex-panel">
           <h3>From hexadecimal: {hex}</h3>
-          <p>Use the 0–F lookup table. Keep all four bits for each digit.</p>
           <div className="hex-mapping">
             {hex.split('').map((d, i) => (
               <div key={i}>
@@ -362,14 +349,10 @@ function ConversionExperiment() {
             <code>{binary}</code>
             <span>Join left to right · 8 bits</span>
           </div>
-          <HexInspector value={hex} />
+          <div className="hex-mini-equation">1 hex digit → 4 bits</div>
         </section>
         <section className="hex-panel">
           <h3>From denary: {value}</h3>
-          <p>
-            One method is repeated division by 2, followed by reading the
-            remainders from bottom to top.
-          </p>
           <Button
             variant="outline"
             onClick={() => setShow(!show)}
@@ -400,14 +383,16 @@ function ConversionExperiment() {
           )}
           <div className="hex-result">
             <code>{binary}</code>
-            <span>Same answer · pad to 8 bits if needed</span>
+            <span>Same answer · 8 bits</span>
           </div>
-          <p className="hex-note">
-            Place-value subtraction is another denary conversion method. Hex is
-            convenient because every digit can be replaced directly with its
-            four-bit group; it is not a claim that every person always converts
-            hex faster.
-          </p>
+          <HexNotes>
+            <p>
+              Place-value subtraction is another denary conversion method. Hex
+              is convenient because every digit can be replaced directly with
+              its four-bit group; it is not a claim that every person always
+              converts hex faster.
+            </p>
+          </HexNotes>
         </section>
       </div>
     </>
@@ -430,33 +415,10 @@ export function HexAdvantagesPage() {
       kind="hex"
       sectionId="1.1"
       showSettings={false}
+      collapseReference
       reference={
         <>
           <HexReference />
-          <div className="studio-concepts">
-            <article>
-              <h3>Compact</h3>
-              <p>
-                Fewer digits mean less screen space. The same display can show
-                more information, or the same information can use a smaller
-                display.
-              </p>
-            </article>
-            <article>
-              <h3>Human-readable</h3>
-              <p>
-                Shorter codes are easier to read and compare, making debugging
-                easier and transcription mistakes less likely.
-              </p>
-            </article>
-            <article>
-              <h3>Easy to convert</h3>
-              <p>
-                One hex digit maps directly to four bits. This simple grouping
-                does not work for denary digits.
-              </p>
-            </article>
-          </div>
         </>
       }
     >
@@ -472,7 +434,6 @@ export function HexAdvantagesPage() {
           onSelect={setTab}
         />
         <div className="hex-context">
-          <span>SAME DATA · FRIENDLIER NOTATION</span>
           <Button
             variant="ghost"
             onClick={() => {

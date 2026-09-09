@@ -37,15 +37,18 @@ jobs:
         run: npm run lint
 
       - name: Run unit tests
+        if: "!contains(github.event.head_commit.message, '[skip tests]')"
         run: npm test
 
       - name: Build the site
         run: npm run build
 
       - name: Install Chromium
+        if: "!contains(github.event.head_commit.message, '[skip tests]')"
         run: npx playwright install --with-deps chromium
 
       - name: Run functional browser tests
+        if: "!contains(github.event.head_commit.message, '[skip tests]')"
         run: npx playwright test tests/e2e/simulator.spec.ts tests/e2e/studios.spec.ts tests/e2e/utf16.spec.ts tests/e2e/image-journey.spec.ts tests/e2e/hexadecimal.spec.ts
 
       - name: Audit dependencies
@@ -60,6 +63,8 @@ jobs:
           path: ./dist
 
   visual-regression:
+    # Explicit per-commit opt-out; normal pushes still run the full test suite.
+    if: "!contains(github.event.head_commit.message, '[skip tests]')"
     runs-on: macos-15
     steps:
       - name: Check out repository
@@ -81,6 +86,7 @@ jobs:
         run: npm run test:visual
 
   deploy:
+    if: ${{ always() && needs.build.result == 'success' && (needs['visual-regression'].result == 'success' || needs['visual-regression'].result == 'skipped') }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { hexAlphabet, hexToBinary } from '../lib/hexadecimal';
 
 export function HexNavigation({
@@ -33,8 +33,7 @@ export function HexInspector({ value }: { value: string }) {
   return (
     <section className="hex-inspector" aria-label="Hex digit inspector">
       <div>
-        <h3>One hex digit = four bits</h3>
-        <p>Select a digit to unpack its binary group.</p>
+        <h3>Tap a digit → 4 bits</h3>
       </div>
       <div className="hex-digit-strip">
         {value.split('').map((d, i) => (
@@ -61,6 +60,15 @@ export function HexInspector({ value }: { value: string }) {
         <span>= {parseInt(digit, 16)} in denary</span>
       </output>
     </section>
+  );
+}
+
+export function HexNotes({ children }: { children: ReactNode }) {
+  return (
+    <details className="hex-teacher-notes">
+      <summary>Teacher notes</summary>
+      <div>{children}</div>
+    </details>
   );
 }
 

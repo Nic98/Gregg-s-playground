@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  AlertTriangle,
-  ArrowRight,
-  Monitor,
-  Network,
-  Palette,
-  RotateCcw,
-} from 'lucide-react';
+import { AlertTriangle, ArrowRight, Monitor, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { StudioLayout } from '../components/StudioLayout';
@@ -14,6 +7,7 @@ import {
   HexInspector,
   HexNavigation,
   HexReference,
+  HexNotes,
 } from '../components/HexWorkbench';
 import { compressIPv6, hexToBinary, rgbHex } from '../lib/hexadecimal';
 import '../hex.css';
@@ -55,12 +49,7 @@ function ErrorExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">01 / Error code</p>
-        <h2>A short code. A precise lookup.</h2>
-        <p>
-          Trigger a fault in this imaginary classroom device. Read its
-          hexadecimal code, then use the codebook to find the problem.
-        </p>
+        <h2>Trigger a fault.</h2>
         <div className="hex-actions">
           {faults.map((f, i) => (
             <Button
@@ -82,9 +71,7 @@ function ErrorExperiment() {
           </span>
           <strong className="hex-error-code">0x{item.code}</strong>
           <code>{hexToBinary(item.code)} in binary</code>
-          <p>
-            Same 16-bit code. Four hex digits instead of sixteen binary digits.
-          </p>
+          <span>4 hex digits ↔ 16 bits</span>
         </div>
         <Button
           variant="default"
@@ -127,12 +114,14 @@ function ErrorExperiment() {
             ))}
           </tbody>
         </table>
-        <p className="hex-note">
-          These are invented teaching codes, not real operating-system errors.
-          Their meanings come from this device’s documentation; hexadecimal
-          alone does not explain an error.
-        </p>
         <HexInspector value={item.code} />
+        <HexNotes>
+          <p>
+            These are invented teaching codes, not real operating-system errors.
+            Their meanings come from this device’s documentation; hexadecimal
+            alone does not explain an error.
+          </p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -151,12 +140,7 @@ function ColourExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">02 / HTML colour code</p>
-        <h2>Mix light with #RRGGBB.</h2>
-        <p>
-          Web pages can use six hexadecimal digits to describe an RGB colour.
-          Two digits control each channel, from 00 to FF (0 to 255).
-        </p>
+        <h2>Mix a colour.</h2>
         <figure
           className="hex-colour-swatch"
           style={{ background: `#${hex}` }}
@@ -216,7 +200,7 @@ function ColourExperiment() {
         </div>
       </section>
       <aside className="hex-panel">
-        <h3>Red + green + blue</h3>
+        <h3>#RR GG BB</h3>
         {['Red', 'Green', 'Blue'].map((label, i) => (
           <div className="hex-channel" key={label}>
             <div>
@@ -242,11 +226,14 @@ function ColourExperiment() {
             <code>{hexToBinary(hex.slice(i * 2, i * 2 + 2))} · 8 bits</code>
           </div>
         ))}
-        <p className="hex-note">
-          6 hex digits × 4 bits = 24 bits for this RGB colour. The # is a colour
-          marker, not a digit. This example does not include transparency.
-        </p>
+        <div className="hex-mini-equation">6 hex digits × 4 = 24 bits</div>
         <HexInspector value={hex} />
+        <HexNotes>
+          <p>
+            Each RGB channel runs from 00 to FF (0–255). The # is a marker, not
+            a digit. This six-digit example has no transparency.
+          </p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -260,12 +247,7 @@ function MacExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">03 / MAC address</p>
-        <h2>Recognise a network interface.</h2>
-        <p>
-          A typical MAC address is a 48-bit identifier for a network interface.
-          Hexadecimal displays it as six pairs of digits.
-        </p>
+        <h2>Pick a device. Tap a byte.</h2>
         <div className="hex-device-list">
           {devices.map((item, index) => (
             <button
@@ -308,21 +290,20 @@ function MacExperiment() {
           <ArrowRight />
           <code>{hexToBinary(bytes[byte])}</code>
         </div>
-        <p>2 hex digits = 8 bits = 1 byte.</p>
+        <div className="hex-mini-equation">2 hex digits = 8 bits</div>
         <HexInspector value={bytes[byte]} />
-        <div className="hex-callout">
-          <strong>12 hex digits ↔ 48 bits</strong>
-          <p>
-            The colons separate the six bytes; they are not part of the 48-bit
-            value.
-          </p>
+        <div className="hex-mini-equation">
+          6 bytes · 12 hex digits · 48 bits
         </div>
-        <p className="hex-note">
-          These are fictional, locally administered addresses. A MAC identifies
-          an interface on a local network, not its geographical location.
-          Addresses can be changed or randomised; they are not a guarantee of
-          identity.
-        </p>
+        <HexNotes>
+          <p>
+            These are fictional, locally administered addresses. A MAC
+            identifies an interface on a local network, not its geographical
+            location. Addresses can be changed or randomised; they are not a
+            guarantee of identity.
+          </p>
+          <p>Colons separate bytes; they are not part of the 48-bit value.</p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -337,12 +318,7 @@ function IpExperiment() {
   return (
     <div className="hex-experiment-grid">
       <section className="hex-panel">
-        <p className="studio-kicker">04 / IP address · IPv6</p>
-        <h2>A readable address for 128 bits.</h2>
-        <p>
-          IPv6 uses hexadecimal notation. Its full form contains eight groups of
-          four hex digits, separated by colons.
-        </p>
+        <h2>IPv6: tap a group.</h2>
         <div className="hex-actions">
           {addresses.map((_, i) => (
             <Button
@@ -386,11 +362,11 @@ function IpExperiment() {
             </button>
           ))}
         </div>
-        <p className="hex-note">
+        <div className="hex-mini-equation">
           {compressed
-            ? 'Leading zeros can be omitted. One run of all-zero groups can be replaced with ::. The address still represents exactly the same 128 bits.'
-            : 'Select any group above. Four hexadecimal digits represent sixteen bits, including leading zeros.'}
-        </p>
+            ? 'Shorter notation. Still 128 bits.'
+            : '8 groups × 16 bits = 128 bits'}
+        </div>
       </section>
       <aside className="hex-panel">
         <h3>Inspect group {group + 1}</h3>
@@ -400,19 +376,20 @@ function IpExperiment() {
           <code>{hexToBinary(groups[group])}</code>
         </div>
         <HexInspector value={groups[group]} />
-        <div className="hex-callout">
-          <strong>8 × 4 × 4 = 128 bits</strong>
-          <p>8 groups × 4 hex digits × 4 bits per digit.</p>
+        <div className="hex-address-contrast">
+          <span>IPv4 · denary · 32 bits</span>
+          <code>192.0.2.10</code>
         </div>
-        <h3>IPv4 is different</h3>
-        <p>
-          <code>192.0.2.10</code> is dotted-denary IPv4: four decimal numbers
-          representing 32 bits. Do not label it as hexadecimal.
-        </p>
-        <p className="hex-note">
-          All addresses here use documentation-only example ranges. No network
-          connection or device lookup is made.
-        </p>
+        <HexNotes>
+          <p>
+            All addresses here use documentation-only example ranges. No network
+            connection or device lookup is made.
+          </p>
+          <p>
+            IPv6 can omit leading zeros and replace one run of zero groups with
+            ::. Shortening the notation does not change the address.
+          </p>
+        </HexNotes>
       </aside>
     </div>
   );
@@ -434,35 +411,8 @@ export function HexApplicationsPage() {
       kind="hex"
       sectionId="1.1"
       showSettings={false}
-      reference={
-        <>
-          <HexReference />
-          <div className="studio-concepts">
-            <article>
-              <AlertTriangle />
-              <h3>Error codes</h3>
-              <p>
-                Compact identifiers make faults easier to report and look up.
-              </p>
-            </article>
-            <article>
-              <Palette />
-              <h3>HTML colour codes</h3>
-              <p>
-                Pairs of hex digits represent red, green and blue channel
-                values.
-              </p>
-            </article>
-            <article>
-              <Network />
-              <h3>Network addresses</h3>
-              <p>
-                MAC and IPv6 addresses use hex to represent long binary values.
-              </p>
-            </article>
-          </div>
-        </>
-      }
+      collapseReference
+      reference={<HexReference />}
     >
       <div className="hex-workbench">
         <HexNavigation
@@ -471,7 +421,6 @@ export function HexApplicationsPage() {
           onSelect={setTab}
         />
         <div className="hex-context">
-          <span>HEX FIELD GUIDE · 4 APPLICATIONS</span>
           <Button
             variant="ghost"
             onClick={() => {

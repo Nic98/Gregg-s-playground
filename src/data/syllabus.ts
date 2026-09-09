@@ -110,8 +110,7 @@ export const numberDemos: (Omit<StudioDemo, 'id'> & {
     category: 'Number systems',
     status: 'live',
     route: hexApplicationsRoute,
-    description:
-      'Investigate an error, mix a web colour, inspect a MAC address and unpack an IPv6 address. Four places where hexadecimal makes binary readable.',
+    description: 'Trigger errors. Mix colours. Explore addresses.',
     concepts: ['Error codes', 'HTML colours', 'MAC & IPv6'],
   },
   {
@@ -120,8 +119,7 @@ export const numberDemos: (Omit<StudioDemo, 'id'> & {
     category: 'Number systems',
     status: 'live',
     route: hexAdvantagesRoute,
-    description:
-      'Shrink a binary display, spot a copying error, fit more values on a small screen and convert each hex digit into four bits.',
+    description: 'Shrink codes. Spot mistakes. Fit more. Convert faster.',
     concepts: ['Compact notation', 'Easier debugging', 'Four-bit groups'],
   },
 ];

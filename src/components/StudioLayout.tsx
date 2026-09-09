@@ -13,6 +13,7 @@ export function StudioLayout({
   reference,
   showSettings = true,
   sectionId = '1.2',
+  collapseReference = false,
 }: {
   title: string;
   kind: 'text' | 'sound' | 'image' | 'hex';
@@ -20,6 +21,7 @@ export function StudioLayout({
   reference: ReactNode;
   showSettings?: boolean;
   sectionId?: '1.1' | '1.2';
+  collapseReference?: boolean;
 }) {
   const section = syllabus
     .flatMap((topic) => topic.sections)
@@ -97,12 +99,19 @@ export function StudioLayout({
           </nav>
         )}
       </div>
-      <section className="studio-reference">
-        <p className="studio-kicker">
-          0478 / {sectionId} · Syllabus essentials
-        </p>
-        {reference}
-      </section>
+      {collapseReference ? (
+        <details className="studio-reference hex-reference-disclosure">
+          <summary>Hex lookup & teacher notes</summary>
+          {reference}
+        </details>
+      ) : (
+        <section className="studio-reference">
+          <p className="studio-kicker">
+            0478 / {sectionId} · Syllabus essentials
+          </p>
+          {reference}
+        </section>
+      )}
     </main>
   );
 }
