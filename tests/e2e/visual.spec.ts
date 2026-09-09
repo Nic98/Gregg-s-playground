@@ -2,9 +2,56 @@ import { expect, test, type Page } from '@playwright/test';
 
 const sectionHash = '#/topics/1-data-representation/1-2-text-sound-images';
 const simulatorHash = `${sectionHash}/pixel-bead-simulator`;
+const numbersHash = '#/topics/1-data-representation/1-1-number-systems';
 
 async function ready(page: Page) {
   await page.evaluate(() => document.fonts.ready);
+}
+
+for (const example of [
+  { slug: '', stage: -1, name: 'number-systems', mobile: false },
+  {
+    slug: '/hexadecimal-in-action',
+    stage: 0,
+    name: 'hex-errors',
+    mobile: false,
+  },
+  {
+    slug: '/hexadecimal-in-action',
+    stage: 1,
+    name: 'hex-colours',
+    mobile: false,
+  },
+  { slug: '/hexadecimal-in-action', stage: 2, name: 'hex-mac', mobile: false },
+  { slug: '/hexadecimal-in-action', stage: 3, name: 'hex-ipv6', mobile: false },
+  { slug: '/why-hexadecimal', stage: 0, name: 'hex-space', mobile: false },
+  { slug: '/why-hexadecimal', stage: 1, name: 'hex-debug', mobile: false },
+  { slug: '/why-hexadecimal', stage: 2, name: 'hex-capacity', mobile: false },
+  { slug: '/why-hexadecimal', stage: 3, name: 'hex-conversion', mobile: false },
+  {
+    slug: '/hexadecimal-in-action',
+    stage: 1,
+    name: 'hex-colours-mobile',
+    mobile: true,
+  },
+  {
+    slug: '/why-hexadecimal',
+    stage: 2,
+    name: 'hex-capacity-mobile',
+    mobile: true,
+  },
+]) {
+  test(`${example.name} visual baseline`, async ({ page }) => {
+    if (example.mobile) await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`./${numbersHash}${example.slug}`);
+    await ready(page);
+    if (example.stage >= 0)
+      await page.locator('.hex-nav button').nth(example.stage).click();
+    await expect(page).toHaveScreenshot(`${example.name}.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.01,
+    });
+  });
 }
 
 test.use({ viewport: { width: 1366, height: 768 } });

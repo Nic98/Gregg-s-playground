@@ -206,6 +206,19 @@ export function HomePage() {
 
           <div className="topic-catalogue-group">
             <TopicShowcase topic={featuredTopic} />
+            <nav
+              className="live-section-links"
+              aria-label="Live data representation sections"
+            >
+              {featuredTopic.sections
+                .filter((section) => section.status === 'live' && section.route)
+                .map((section) => (
+                  <Link key={section.id} to={section.route!}>
+                    {section.id} · {section.title}
+                    <ArrowRight size={18} />
+                  </Link>
+                ))}
+            </nav>
             <div className="topic-compact-grid">
               {paperOneTopics.slice(1).map((topic) => (
                 <CompactTopicCard key={topic.number} topic={topic} />

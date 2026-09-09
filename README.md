@@ -24,6 +24,13 @@ Topic 1.2, _Text, sound and images_, contains six live teacher-led studios:
 
 The size shown in the lab is raw, uncompressed pixel data. Real PNG and JPEG files also include file structures and may use compression, metadata, palettes and transparency.
 
+Topic 1.1, _Number systems_, contains two additional live studios:
+
+- **Hexadecimal in action**: trigger fictional device errors and consult a codebook; mix `#RRGGBB` web colours using editable hex values and RGB sliders; select six-byte MAC addresses; inspect the eight groups of a 128-bit IPv6 address. Every example has a selectable hex-digit-to-four-bit inspector. IPv4 is explicitly distinguished as dotted denary. No device scanning or network requests are made.
+- **Why hexadecimal?**: switch a 32-bit value between binary and hex, find a one-bit transcription error, fit more 16-bit values on a fixed character display, and compare hex-to-binary lookup with denary division by two. Display savings are not described as data compression. The examples preserve leading zeros and make prefixes, spaces and separator exclusions explicit.
+
+All error codes and MAC addresses are fictional. IPv6 uses the `2001:db8::/32` documentation range and the IPv4 example uses TEST-NET-1. RGB examples use six-digit colour notation without alpha. Shortened IPv6 notation is a contextual extension, not a separate required conversion exercise.
+
 ## Run locally
 
 Requirements: Node.js 22.13 or later and npm.
@@ -51,6 +58,9 @@ The unit suite covers image-size maths, binary codes, crop boundaries, area aver
 The site uses hash routing so every activity works on static GitHub Pages hosting.
 
 - `#/` — full syllabus catalogue
+- `#/topics/1-data-representation/1-1-number-systems` — Topic 1.1
+- `#/topics/1-data-representation/1-1-number-systems/hexadecimal-in-action` — Hexadecimal in action
+- `#/topics/1-data-representation/1-1-number-systems/why-hexadecimal` — Why hexadecimal?
 - `#/topics/1-data-representation/1-2-text-sound-images` — Topic 1.2
 - `#/topics/1-data-representation/1-2-text-sound-images/how-image-becomes-binary` — How an image becomes binary
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
@@ -73,7 +83,7 @@ Built-in signals are deterministic 48 kHz synthetic clips. Lower-rate versions u
 1. Add or update the topic/subsection in `src/data/syllabus.ts`, including its status and route.
 2. Add the new page in `src/pages/`.
 3. Register the route in `src/App.tsx`.
-4. For Topic 1.2, add a `studioDemos` registry entry; the launch card and focus-shell routing use it automatically. For other subsections, add a launch card to that subsection page.
+4. For Topic 1.2, add a `studioDemos` registry entry; for Topic 1.1, add a `numberDemos` entry. Their launch cards and focus-shell routing use the registry automatically. For other subsections, add a launch card and include its registry in `allDemos`. Pass the appropriate section identifier to `StudioLayout` for its back link and teaching reference.
 5. Add unit or browser coverage for its important teaching interactions.
 
 Shared curriculum navigation and status badges read from the typed syllabus registry, so the catalogue stays consistent as more demonstrations become live.

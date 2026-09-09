@@ -24,6 +24,10 @@ export const utf16KeyboardRoute = `${sectionRoute}/utf16-keyboard`;
 
 export const soundJourneyRoute = `${sectionRoute}/how-sound-becomes-binary`;
 export const imageJourneyRoute = `${sectionRoute}/how-image-becomes-binary`;
+export const numberSectionRoute =
+  '/topics/1-data-representation/1-1-number-systems';
+export const hexApplicationsRoute = `${numberSectionRoute}/hexadecimal-in-action`;
+export const hexAdvantagesRoute = `${numberSectionRoute}/why-hexadecimal`;
 
 export interface StudioDemo {
   id: 'text' | 'sound' | 'image' | 'utf16' | 'sound-journey' | 'image-journey';
@@ -97,13 +101,44 @@ export const studioDemos: StudioDemo[] = [
   },
 ];
 
+export const numberDemos: (Omit<StudioDemo, 'id'> & {
+  id: 'hex-applications' | 'hex-advantages';
+})[] = [
+  {
+    id: 'hex-applications',
+    title: 'Hexadecimal in action',
+    category: 'Number systems',
+    status: 'live',
+    route: hexApplicationsRoute,
+    description:
+      'Investigate an error, mix a web colour, inspect a MAC address and unpack an IPv6 address. Four places where hexadecimal makes binary readable.',
+    concepts: ['Error codes', 'HTML colours', 'MAC & IPv6'],
+  },
+  {
+    id: 'hex-advantages',
+    title: 'Why hexadecimal?',
+    category: 'Number systems',
+    status: 'live',
+    route: hexAdvantagesRoute,
+    description:
+      'Shrink a binary display, spot a copying error, fit more values on a small screen and convert each hex digit into four bits.',
+    concepts: ['Compact notation', 'Easier debugging', 'Four-bit groups'],
+  },
+];
+export const allDemos = [...numberDemos, ...studioDemos];
+
 export const syllabus: SyllabusTopic[] = [
   {
     number: 1,
     title: 'Data representation',
     paper: 1,
     sections: [
-      { id: '1.1', title: 'Number systems', status: 'coming-soon' },
+      {
+        id: '1.1',
+        title: 'Number systems',
+        status: 'live',
+        route: numberSectionRoute,
+      },
       {
         id: '1.2',
         title: 'Text, sound and images',

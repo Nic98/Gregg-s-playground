@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Maximize, Minimize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppShell } from './AppShell';
-import { sectionRoute } from '../data/syllabus';
+import { sectionRoute, syllabus } from '../data/syllabus';
 import '../studio.css';
 
 export function StudioLayout({
@@ -12,13 +12,18 @@ export function StudioLayout({
   children,
   reference,
   showSettings = true,
+  sectionId = '1.2',
 }: {
   title: string;
-  kind: 'text' | 'sound' | 'image';
+  kind: 'text' | 'sound' | 'image' | 'hex';
   children: ReactNode;
   reference: ReactNode;
   showSettings?: boolean;
+  sectionId?: '1.1' | '1.2';
 }) {
+  const section = syllabus
+    .flatMap((topic) => topic.sections)
+    .find((entry) => entry.id === sectionId);
   const { openNavigation } = useAppShell();
   const ref = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
@@ -51,9 +56,9 @@ export function StudioLayout({
           >
             <BookOpen />
           </Button>
-          <Link className="studio-back" to={sectionRoute}>
+          <Link className="studio-back" to={section?.route ?? sectionRoute}>
             <ArrowLeft size={16} />
-            <span>Topic 1.2</span>
+            <span>Topic {sectionId}</span>
           </Link>
           <h1>{title}</h1>
           <Button
@@ -93,7 +98,9 @@ export function StudioLayout({
         )}
       </div>
       <section className="studio-reference">
-        <p className="studio-kicker">0478 / 1.2 · Syllabus essentials</p>
+        <p className="studio-kicker">
+          0478 / {sectionId} · Syllabus essentials
+        </p>
         {reference}
       </section>
     </main>

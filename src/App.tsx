@@ -11,6 +11,9 @@ import {
   soundJourneyRoute,
   imageJourneyRoute,
   utf16KeyboardRoute,
+  numberSectionRoute,
+  hexApplicationsRoute,
+  hexAdvantagesRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
 import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
@@ -18,6 +21,9 @@ import { Utf16KeyboardPage } from '@/src/pages/Utf16KeyboardPage';
 
 import { SoundJourneyPage } from '@/src/pages/SoundJourneyPage';
 import { ImageJourneyPage } from '@/src/pages/ImageJourneyPage';
+import { NumberSystemsPage } from '@/src/pages/NumberSystemsPage';
+import { HexApplicationsPage } from '@/src/pages/HexApplicationsPage';
+import { HexAdvantagesPage } from '@/src/pages/HexAdvantagesPage';
 
 function App() {
   return (
@@ -25,6 +31,9 @@ function App() {
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
         <Route path={sectionRoute} element={<SectionPage />} />
+        <Route path={numberSectionRoute} element={<NumberSystemsPage />} />
+        <Route path={hexApplicationsRoute} element={<HexApplicationsPage />} />
+        <Route path={hexAdvantagesRoute} element={<HexAdvantagesPage />} />
         <Route path={simulatorRoute} element={<SimulatorPage />} />
         <Route path={textStudioRoute} element={<TextStudioPage />} />
         <Route path={soundJourneyRoute} element={<SoundJourneyPage />} />
