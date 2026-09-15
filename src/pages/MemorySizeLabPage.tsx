@@ -30,11 +30,7 @@ function SystemSwitch({
   onChange: (value: MemorySystem) => void;
 }) {
   return (
-    <div
-      className="memory-system-switch"
-      role="group"
-      aria-label="Memory size system"
-    >
+    <fieldset className="memory-system-switch" aria-label="Memory size system">
       <Button
         variant={system === 'iec' ? 'accent' : 'outline'}
         aria-pressed={system === 'iec'}
@@ -49,7 +45,7 @@ function SystemSwitch({
       >
         Denary · ×1,000
       </Button>
-    </div>
+    </fieldset>
   );
 }
 
@@ -65,9 +61,8 @@ function UnitPicker({
   ladder?: boolean;
 }) {
   return (
-    <div
+    <fieldset
       className={ladder ? 'memory-unit-ladder' : 'memory-unit-picker'}
-      role="group"
       aria-label="Choose a memory unit"
     >
       {memoryUnits[system].map((unit, i) => (
@@ -89,7 +84,7 @@ function UnitPicker({
           </Button>
         </Fragment>
       ))}
-    </div>
+    </fieldset>
   );
 }
 
@@ -145,9 +140,8 @@ function UnitLadder() {
               <span>1</span>
             </div>
           ) : (
-            <div
+            <figure
               className={`memory-bundle-grid ${index === 1 ? 'memory-bundle-grid--byte' : ''}`}
-              role="img"
               aria-label={`One ${unit.name} contains ${factor} ${lowerUnit.name}s`}
             >
               {Array.from({ length: index === 1 ? 8 : 1024 }, (_, i) => (
@@ -165,7 +159,7 @@ function UnitLadder() {
                   {index === 1 ? 'b' : null}
                 </span>
               ))}
-            </div>
+            </figure>
           )}
           <div className="memory-bundle-caption">
             <strong>
@@ -333,11 +327,7 @@ function SameStorage() {
           <span className="memory-eyebrow">Same bytes. Different labels.</span>
           <h2>Did the storage shrink?</h2>
         </div>
-        <div
-          className="memory-presets"
-          role="group"
-          aria-label="Storage examples"
-        >
+        <fieldset className="memory-presets" aria-label="Storage examples">
           <Button variant="outline" onClick={() => preset('denary', 5)}>
             1 TB drive
           </Button>
@@ -350,7 +340,7 @@ function SameStorage() {
           <Button variant="outline" onClick={() => preset('denary', 0, '8')}>
             8 bits
           </Button>
-        </div>
+        </fieldset>
       </div>
       <div className="memory-storage-layout">
         <section

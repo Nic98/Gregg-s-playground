@@ -201,10 +201,7 @@ function QualityExperiment({ mode }: { mode: QualityMode }) {
                 />
               </div>
             ) : (
-              <div
-                className="quality-image-well quality-image-placeholder"
-                role="status"
-              >
+              <output className="quality-image-well quality-image-placeholder">
                 {imageError ? (
                   <>
                     <ImageIcon />
@@ -224,7 +221,7 @@ function QualityExperiment({ mode }: { mode: QualityMode }) {
                 ) : (
                   'Loading the reference…'
                 )}
-              </div>
+              </output>
             )}
             <div className="quality-card-metrics">
               <div>
@@ -324,9 +321,9 @@ function QualityExperiment({ mode }: { mode: QualityMode }) {
             : config.conclusion}
         </p>
         {isSound ? (
-          <span role="status">
+          <output>
             {audio.playing ? `Playing ${audio.playing}` : 'Ready to listen'}
-          </span>
+          </output>
         ) : (
           <span>White frame excluded from sampling</span>
         )}

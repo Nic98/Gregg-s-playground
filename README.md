@@ -116,6 +116,6 @@ Palettes are deterministic, cached per colour depth, independent of output resol
 
 ## GitHub Pages deployment
 
-The workflow in `.github/workflows/deploy-pages.yml` tests and builds every push to `main`, then publishes `dist/` using the official GitHub Pages actions. In the repository settings, choose **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The workflow in `.github/workflows/deploy-pages.yml` checks formatting, lints, builds and audits every push to `main`, then publishes `dist/` using the official GitHub Pages actions. Unit, browser and screenshot tests do not run on ordinary pushes. To run them deliberately, use **Actions → Deploy to GitHub Pages → Run workflow** and enable **run_tests**; it defaults to off. No special commit-message marker is needed. In the repository settings, choose **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 Pull requests run linting, unit tests, a production build and Chromium browser tests before merge.

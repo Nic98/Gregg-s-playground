@@ -168,16 +168,14 @@ function DownloadRace({
                 </div>
                 <ArrowDownToLine />
               </div>
-              <div
+              <progress
                 className="file-progress"
-                role="progressbar"
                 aria-label={`${index ? 'After' : 'Before'} transferred`}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(progress * 100)}
+                max={1}
+                value={progress}
               >
-                <span style={{ width: `${progress * 100}%` }} />
-              </div>
+                {Math.round(progress * 100)}%
+              </progress>
               <div className="studio-row file-progress-readout">
                 <strong>{Math.floor(progress * 100)}%</strong>
                 <span>
@@ -229,13 +227,13 @@ function DownloadRace({
           </span>
         </div>
       </div>
-      <span className="sr-only" role="status">
+      <output className="sr-only">
         {complete
           ? 'Both files have arrived.'
           : running
             ? 'Transmission running.'
             : 'Transmission paused or ready.'}
-      </span>
+      </output>
     </>
   );
 }
@@ -346,9 +344,8 @@ function StorageScene({
                 <strong>{number(fits)}</strong>
                 <span>files that fit</span>
               </div>
-              <div
+              <figure
                 className="file-storage-tank"
-                role="img"
                 aria-label={`${stored} files stored. ${number(used)} of ${number(capacity)} bytes used.`}
               >
                 <div
@@ -373,7 +370,7 @@ function StorageScene({
                     {number(stored)} {stored === 1 ? 'file' : 'files'} stored
                   </span>
                 </div>
-              </div>
+              </figure>
               <div className="studio-row file-storage-readout">
                 <span>{formatBytes(used)} used</span>
                 <strong>{formatBytes(capacity - used)} free</strong>
@@ -442,11 +439,7 @@ function FileSizeWorkspace({
           {pair.source === 'example' ? (
             <>
               <span className="effect-kicker">Change file B</span>
-              <div
-                className="effect-actions"
-                role="group"
-                aria-label="After file size"
-              >
+              <fieldset className="effect-actions" aria-label="After file size">
                 {[2, 4, 8, 16].map((mb) => (
                   <Button
                     key={mb}
@@ -459,7 +452,7 @@ function FileSizeWorkspace({
                     {mb} MB
                   </Button>
                 ))}
-              </div>
+              </fieldset>
             </>
           ) : (
             <>

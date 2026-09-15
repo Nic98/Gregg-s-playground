@@ -263,7 +263,8 @@
   font-weight: 650;
   font-size: 16px;
 }
-.effect-caption > span {
+.effect-caption > span,
+.effect-caption > output {
   font-size: 12px;
 }
 .quality-result {
@@ -463,15 +464,23 @@
   background: var(--file-colour);
 }
 .file-progress {
+  display: block;
+  width: 100%;
+  appearance: none;
+  color: var(--file-colour);
   height: 20px;
   border: 1px solid var(--line-strong);
   border-radius: 6px;
   overflow: hidden;
   background: var(--surface-subtle);
 }
-.file-progress > span {
-  display: block;
-  height: 100%;
+.file-progress::-webkit-progress-bar {
+  background: var(--surface-subtle);
+}
+.file-progress::-webkit-progress-value {
+  background: var(--file-colour);
+}
+.file-progress::-moz-progress-bar {
   background: var(--file-colour);
 }
 .file-progress-readout {

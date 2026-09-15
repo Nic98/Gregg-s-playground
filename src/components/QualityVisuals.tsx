@@ -1,3 +1,4 @@
+// oxlint-disable jsx-a11y/prefer-tag-over-role -- Live canvas and inline SVG need image semantics; an img cannot contain or draw these data visualisations.
 import { useEffect, useRef } from 'react';
 import { SOURCE_RATE, type ProcessedSound } from '../lib/soundMath';
 import { type QualityImage } from '../lib/qualityLab';

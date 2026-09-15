@@ -58,9 +58,9 @@ function App() {
           element={
             <Suspense
               fallback={
-                <p className="page-wrap" role="status">
+                <output className="page-wrap block">
                   Opening Memory Size Lab…
-                </p>
+                </output>
               }
             >
               <MemorySizeLabPage />
@@ -72,9 +72,9 @@ function App() {
           element={
             <Suspense
               fallback={
-                <p className="page-wrap" role="status">
+                <output className="page-wrap block">
                   Opening Quality Lab…
-                </p>
+                </output>
               }
             >
               <QualityLabPage />
@@ -86,9 +86,9 @@ function App() {
           element={
             <Suspense
               fallback={
-                <p className="page-wrap" role="status">
+                <output className="page-wrap block">
                   Opening File Size Lab…
-                </p>
+                </output>
               }
             >
               <FileSizeLabPage />
