@@ -34,6 +34,12 @@ Topic 1.1, _Number systems_, contains two additional live studios:
 
 All error codes and MAC addresses are fictional. IPv6 uses the `2001:db8::/32` documentation range and the IPv4 example uses TEST-NET-1. RGB examples use six-digit colour notation without alpha. Shortened IPv6 notation is a contextual extension, not a separate required conversion exercise.
 
+Topic 1.3, _Data storage and compression_, now includes **Memory Size Lab**:
+
+- **Unit ladder**: choose IEC or denary, then unpack each unit from b/B through EiB/EB. One byte is always 8 bits; subsequent steps use 1,024 or 1,000. The 1,024-cell board leaves 24 spaces empty for denary units.
+- **b ≠ B**: flip the eight bits in one byte. Its unsigned value changes, but the storage size remains 8 b = 1 B.
+- **Same storage**: enter 0–1,024 whole units and compare decimal and IEC labels for the exact same capacity. Presets include 1 TB, 1 TiB, 1 EiB and 8 bits. BigInt preserves exact counts above JavaScript's safe-integer range; ≈ identifies rounded ratios. PiB/EiB and PB/EB are marked as extensions in the folded teacher notes.
+
 ## Run locally
 
 Requirements: Node.js 22.13 or later and npm.
@@ -65,6 +71,8 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-1-number-systems/hexadecimal-in-action` — Hexadecimal in action
 - `#/topics/1-data-representation/1-1-number-systems/why-hexadecimal` — Why hexadecimal?
 - `#/topics/1-data-representation/1-2-text-sound-images` — Topic 1.2
+- `#/topics/1-data-representation/1-3-data-storage-compression` — Topic 1.3
+- `#/topics/1-data-representation/1-3-data-storage-compression/memory-size-lab` — Memory Size Lab
 - `#/topics/1-data-representation/1-2-text-sound-images/quality-lab` — Quality Lab
 - `#/topics/1-data-representation/1-2-text-sound-images/file-size-lab` — File Size Lab
 - `#/topics/1-data-representation/1-2-text-sound-images/how-image-becomes-binary` — How an image becomes binary

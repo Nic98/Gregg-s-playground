@@ -17,6 +17,8 @@ import {
   hexAdvantagesRoute,
   qualityLabRoute,
   fileSizeLabRoute,
+  storageSectionRoute,
+  memorySizeLabRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
 import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
@@ -25,6 +27,7 @@ import { Utf16KeyboardPage } from '@/src/pages/Utf16KeyboardPage';
 import { SoundJourneyPage } from '@/src/pages/SoundJourneyPage';
 import { ImageJourneyPage } from '@/src/pages/ImageJourneyPage';
 import { NumberSystemsPage } from '@/src/pages/NumberSystemsPage';
+import { StorageSectionPage } from '@/src/pages/StorageSectionPage';
 import { HexApplicationsPage } from '@/src/pages/HexApplicationsPage';
 import { HexAdvantagesPage } from '@/src/pages/HexAdvantagesPage';
 const QualityLabPage = lazy(() =>
@@ -37,6 +40,11 @@ const FileSizeLabPage = lazy(() =>
     default: module.FileSizeLabPage,
   })),
 );
+const MemorySizeLabPage = lazy(() =>
+  import('@/src/pages/MemorySizeLabPage').then((module) => ({
+    default: module.MemorySizeLabPage,
+  })),
+);
 
 function App() {
   return (
@@ -44,6 +52,21 @@ function App() {
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
         <Route path={sectionRoute} element={<SectionPage />} />
+        <Route path={storageSectionRoute} element={<StorageSectionPage />} />
+        <Route
+          path={memorySizeLabRoute}
+          element={
+            <Suspense
+              fallback={
+                <p className="page-wrap" role="status">
+                  Opening Memory Size Lab…
+                </p>
+              }
+            >
+              <MemorySizeLabPage />
+            </Suspense>
+          }
+        />
         <Route
           path={qualityLabRoute}
           element={

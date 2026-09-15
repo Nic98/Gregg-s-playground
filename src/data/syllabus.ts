@@ -30,6 +30,9 @@ export const numberSectionRoute =
   '/topics/1-data-representation/1-1-number-systems';
 export const hexApplicationsRoute = `${numberSectionRoute}/hexadecimal-in-action`;
 export const hexAdvantagesRoute = `${numberSectionRoute}/why-hexadecimal`;
+export const storageSectionRoute =
+  '/topics/1-data-representation/1-3-data-storage-compression';
+export const memorySizeLabRoute = `${storageSectionRoute}/memory-size-lab`;
 
 export interface StudioDemo {
   id:
@@ -151,7 +154,20 @@ export const numberDemos: (Omit<StudioDemo, 'id'> & {
     concepts: ['Compact notation', 'Easier debugging', 'Four-bit groups'],
   },
 ];
-export const allDemos = [...numberDemos, ...studioDemos];
+export const storageDemos: (Omit<StudioDemo, 'id'> & { id: 'memory-size' })[] =
+  [
+    {
+      id: 'memory-size',
+      title: 'Memory Size Lab',
+      category: 'Storage units',
+      status: 'live',
+      route: memorySizeLabRoute,
+      description:
+        'Climb the units. Flip eight bits. Compare 1,000 with 1,024.',
+      concepts: ['Bits & bytes', 'Denary & IEC', 'kB → EB / KiB → EiB'],
+    },
+  ];
+export const allDemos = [...numberDemos, ...studioDemos, ...storageDemos];
 
 export const syllabus: SyllabusTopic[] = [
   {
@@ -174,7 +190,8 @@ export const syllabus: SyllabusTopic[] = [
       {
         id: '1.3',
         title: 'Data storage and compression',
-        status: 'coming-soon',
+        status: 'live',
+        route: storageSectionRoute,
       },
     ],
   },
