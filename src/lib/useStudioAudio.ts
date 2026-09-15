@@ -48,7 +48,12 @@ export function useStudioAudio() {
       context.current = null;
     };
   }, [stop, cancelRecording]);
-  async function play(samples: Float32Array, rate: number, label: string) {
+  async function play(
+    samples: Float32Array,
+    rate: number,
+    label: string,
+    onComplete?: () => void,
+  ) {
     stop();
     setError('');
     const request = generation.current;
@@ -78,13 +83,18 @@ export function useStudioAudio() {
         if (player.current === source) {
           player.current = null;
           connection.current = null;
-          if (alive.current) setPlaying('');
+          if (alive.current) {
+            setPlaying('');
+            if (request === generation.current) onComplete?.();
+          }
         }
       };
       player.current = source;
-      setPlaying(label);
       source.start();
+      setPlaying(label);
     } catch {
+      if (!alive.current || request !== generation.current) return;
+      stop();
       if (alive.current)
         setError(
           'Audio could not start. Check your browser audio permissions and try again.',

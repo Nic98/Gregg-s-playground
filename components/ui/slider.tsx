@@ -9,6 +9,7 @@ function Slider({
   min = 0,
   max = 100,
   'aria-label': ariaLabel,
+  'aria-valuetext': ariaValueText,
   ...props
 }: SliderPrimitive.Root.Props) {
   const _values = Array.isArray(value)
@@ -46,6 +47,7 @@ function Slider({
           <SliderPrimitive.Thumb
             data-slot="slider-thumb"
             key={index}
+            aria-valuetext={ariaValueText}
             aria-label={
               _values.length === 1 || !ariaLabel
                 ? ariaLabel

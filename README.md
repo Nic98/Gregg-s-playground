@@ -4,7 +4,10 @@ An English-language collection of interactive demonstrations for the Cambridge I
 
 **Live site:** [https://nic98.github.io/Gregg-s-playground/](https://nic98.github.io/Gregg-s-playground/)
 
-Topic 1.2, _Text, sound and images_, contains six live teacher-led studios:
+Topic 1.2, _Text, sound and images_, contains eight teacher-led studios:
+
+- **Quality Lab**: four fixed-before/adjustable-after comparisons for sample resolution, sample rate, image resolution and colour depth. Play either sound or A → B at identical gain and duration; compare same-sized pixel images. One slider changes one variable, with raw-data sizes and the multiplier below. **See file-size impact** carries both exact byte counts to File Size Lab through the hash query. Explanations are folded into Teacher notes.
+- **File Size Lab**: race two files at equal bandwidth, change a shared deadline to see the required bandwidth, or fill equal-capacity storage. Opens independently with 2 MB and 8 MB examples. Very short or long transfers use a labelled shared scaled clock; displayed theoretical times remain real. No actual network transfer takes place. Decimal MB/Mbps are used, and larger files require more bandwidth only when the transfer time must stay the same.
 
 - **How an image becomes binary**: reveal Pixels, Resolution, Colour codes and Sequence in four stages. Change width and height independently, compare 1–3 bits per pixel, and scan a small bitmap from left to right, top to bottom. Select a pixel or its sequence code to trace the connection. The default `4 × 4 × 2` example stores 32 raw bits (4 bytes). Same-colour pixels share a code. The palette is an indexed-colour teaching model; real formats can store RGB values and include compression and file structures.
 
@@ -62,6 +65,8 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-1-number-systems/hexadecimal-in-action` — Hexadecimal in action
 - `#/topics/1-data-representation/1-1-number-systems/why-hexadecimal` — Why hexadecimal?
 - `#/topics/1-data-representation/1-2-text-sound-images` — Topic 1.2
+- `#/topics/1-data-representation/1-2-text-sound-images/quality-lab` — Quality Lab
+- `#/topics/1-data-representation/1-2-text-sound-images/file-size-lab` — File Size Lab
 - `#/topics/1-data-representation/1-2-text-sound-images/how-image-becomes-binary` — How an image becomes binary
 - `#/topics/1-data-representation/1-2-text-sound-images/pixel-bead-simulator` — Pixel Bead Simulator
 - `#/topics/1-data-representation/1-2-text-sound-images/binary-post-office` — Binary Post Office

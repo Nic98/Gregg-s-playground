@@ -24,13 +24,23 @@ export const utf16KeyboardRoute = `${sectionRoute}/utf16-keyboard`;
 
 export const soundJourneyRoute = `${sectionRoute}/how-sound-becomes-binary`;
 export const imageJourneyRoute = `${sectionRoute}/how-image-becomes-binary`;
+export const qualityLabRoute = `${sectionRoute}/quality-lab`;
+export const fileSizeLabRoute = `${sectionRoute}/file-size-lab`;
 export const numberSectionRoute =
   '/topics/1-data-representation/1-1-number-systems';
 export const hexApplicationsRoute = `${numberSectionRoute}/hexadecimal-in-action`;
 export const hexAdvantagesRoute = `${numberSectionRoute}/why-hexadecimal`;
 
 export interface StudioDemo {
-  id: 'text' | 'sound' | 'image' | 'utf16' | 'sound-journey' | 'image-journey';
+  id:
+    | 'text'
+    | 'sound'
+    | 'image'
+    | 'utf16'
+    | 'sound-journey'
+    | 'image-journey'
+    | 'quality'
+    | 'files';
   title: string;
   category: string;
   status: ContentStatus;
@@ -39,6 +49,24 @@ export interface StudioDemo {
   concepts: string[];
 }
 export const studioDemos: StudioDemo[] = [
+  {
+    id: 'quality',
+    title: 'Quality Lab',
+    category: 'Sound & image quality',
+    status: 'live',
+    route: qualityLabRoute,
+    description: 'Slide one setting. See it. Hear it. Compare the size.',
+    concepts: ['Sample rate & resolution', 'Pixels & colour depth'],
+  },
+  {
+    id: 'files',
+    title: 'File Size Lab',
+    category: 'File size effects',
+    status: 'live',
+    route: fileSizeLabRoute,
+    description: 'Race two downloads. Meet a deadline. Fill the storage.',
+    concepts: ['Transfer time', 'Bandwidth', 'Storage'],
+  },
   {
     id: 'image-journey',
     title: 'How an image becomes binary',

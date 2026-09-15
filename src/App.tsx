@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '@/src/components/AppShell';
 import { HomePage } from '@/src/pages/HomePage';
@@ -14,6 +15,8 @@ import {
   numberSectionRoute,
   hexApplicationsRoute,
   hexAdvantagesRoute,
+  qualityLabRoute,
+  fileSizeLabRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
 import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
@@ -24,6 +27,16 @@ import { ImageJourneyPage } from '@/src/pages/ImageJourneyPage';
 import { NumberSystemsPage } from '@/src/pages/NumberSystemsPage';
 import { HexApplicationsPage } from '@/src/pages/HexApplicationsPage';
 import { HexAdvantagesPage } from '@/src/pages/HexAdvantagesPage';
+const QualityLabPage = lazy(() =>
+  import('@/src/pages/QualityLabPage').then((module) => ({
+    default: module.QualityLabPage,
+  })),
+);
+const FileSizeLabPage = lazy(() =>
+  import('@/src/pages/FileSizeLabPage').then((module) => ({
+    default: module.FileSizeLabPage,
+  })),
+);
 
 function App() {
   return (
@@ -31,6 +44,34 @@ function App() {
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
         <Route path={sectionRoute} element={<SectionPage />} />
+        <Route
+          path={qualityLabRoute}
+          element={
+            <Suspense
+              fallback={
+                <p className="page-wrap" role="status">
+                  Opening Quality Lab…
+                </p>
+              }
+            >
+              <QualityLabPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path={fileSizeLabRoute}
+          element={
+            <Suspense
+              fallback={
+                <p className="page-wrap" role="status">
+                  Opening File Size Lab…
+                </p>
+              }
+            >
+              <FileSizeLabPage />
+            </Suspense>
+          }
+        />
         <Route path={numberSectionRoute} element={<NumberSystemsPage />} />
         <Route path={hexApplicationsRoute} element={<HexApplicationsPage />} />
         <Route path={hexAdvantagesRoute} element={<HexAdvantagesPage />} />

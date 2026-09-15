@@ -14,14 +14,16 @@ export function StudioLayout({
   showSettings = true,
   sectionId = '1.2',
   collapseReference = false,
+  referenceTitle = 'Hex lookup & teacher notes',
 }: {
   title: string;
-  kind: 'text' | 'sound' | 'image' | 'hex';
+  kind: 'text' | 'sound' | 'image' | 'hex' | 'quality' | 'files';
   children: ReactNode;
   reference: ReactNode;
   showSettings?: boolean;
   sectionId?: '1.1' | '1.2';
   collapseReference?: boolean;
+  referenceTitle?: string;
 }) {
   const section = syllabus
     .flatMap((topic) => topic.sections)
@@ -101,7 +103,7 @@ export function StudioLayout({
       </div>
       {collapseReference ? (
         <details className="studio-reference hex-reference-disclosure">
-          <summary>Hex lookup & teacher notes</summary>
+          <summary>{referenceTitle}</summary>
           {reference}
         </details>
       ) : (

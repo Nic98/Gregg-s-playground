@@ -5,6 +5,8 @@ import {
   Image as ImageIcon,
   Music2,
   Keyboard,
+  SlidersHorizontal,
+  HardDrive,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +15,7 @@ import { PageHeader } from '@/src/components/PageHeader';
 import { PixelMark } from '@/src/components/PixelMark';
 import { studioDemos } from '@/src/data/syllabus';
 import '../studio.css';
+import '../effects.css';
 
 const icons = {
   text: FileText,
@@ -21,6 +24,8 @@ const icons = {
   'image-journey': ImageIcon,
   image: ImageIcon,
   utf16: Keyboard,
+  quality: SlidersHorizontal,
+  files: HardDrive,
 };
 export function SectionPage() {
   useEffect(() => {
@@ -62,7 +67,31 @@ export function SectionPage() {
                 <LiveBadge />
               </div>
               <div className="chapter-preview" aria-hidden="true">
-                {demo.id === 'image-journey' ? (
+                {demo.id === 'quality' ? (
+                  <>
+                    <strong>4 → 16 bits</strong>
+                    <div className="quality-card-preview">
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <code>CHANGE · SEE · LISTEN</code>
+                  </>
+                ) : demo.id === 'files' ? (
+                  <>
+                    <strong>2 MB → 8 MB</strong>
+                    <div className="files-card-preview">
+                      <span />
+                      <span />
+                    </div>
+                    <code>TIME · BANDWIDTH · STORAGE</code>
+                  </>
+                ) : demo.id === 'image-journey' ? (
                   <>
                     <strong>16 pixels</strong>
                     <code>00 01 10 11 → BINARY</code>
