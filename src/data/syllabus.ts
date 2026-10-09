@@ -33,6 +33,9 @@ export const hexAdvantagesRoute = `${numberSectionRoute}/why-hexadecimal`;
 export const storageSectionRoute =
   '/topics/1-data-representation/1-3-data-storage-compression';
 export const memorySizeLabRoute = `${storageSectionRoute}/memory-size-lab`;
+export const transmissionSectionRoute =
+  '/topics/2-data-transmission/2-1-types-and-methods';
+export const transmissionLabRoute = `${transmissionSectionRoute}/transmission-lab`;
 
 export interface StudioDemo {
   id:
@@ -167,7 +170,25 @@ export const storageDemos: (Omit<StudioDemo, 'id'> & { id: 'memory-size' })[] =
       concepts: ['Bits & bytes', 'Denary & IEC', 'kB → EB / KiB → EiB'],
     },
   ];
-export const allDemos = [...numberDemos, ...studioDemos, ...storageDemos];
+export const transmissionDemos: (Omit<StudioDemo, 'id'> & {
+  id: 'transmission';
+})[] = [
+  {
+    id: 'transmission',
+    title: 'Transmission Lab',
+    category: 'Types and methods of data transmission',
+    status: 'live',
+    route: transmissionLabRoute,
+    description: 'Mix the methods. Send the bits. See what arrives.',
+    concepts: ['Serial & parallel', 'Direction modes', 'Skew & crosstalk'],
+  },
+];
+export const allDemos = [
+  ...numberDemos,
+  ...studioDemos,
+  ...storageDemos,
+  ...transmissionDemos,
+];
 
 export const syllabus: SyllabusTopic[] = [
   {
@@ -203,7 +224,8 @@ export const syllabus: SyllabusTopic[] = [
       {
         id: '2.1',
         title: 'Types and methods of data transmission',
-        status: 'coming-soon',
+        status: 'live',
+        route: transmissionSectionRoute,
       },
       { id: '2.2', title: 'Methods of error detection', status: 'coming-soon' },
       { id: '2.3', title: 'Encryption', status: 'coming-soon' },

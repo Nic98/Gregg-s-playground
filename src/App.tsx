@@ -19,6 +19,8 @@ import {
   fileSizeLabRoute,
   storageSectionRoute,
   memorySizeLabRoute,
+  transmissionSectionRoute,
+  transmissionLabRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
 import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
@@ -28,6 +30,7 @@ import { SoundJourneyPage } from '@/src/pages/SoundJourneyPage';
 import { ImageJourneyPage } from '@/src/pages/ImageJourneyPage';
 import { NumberSystemsPage } from '@/src/pages/NumberSystemsPage';
 import { StorageSectionPage } from '@/src/pages/StorageSectionPage';
+import { TransmissionSectionPage } from '@/src/pages/TransmissionSectionPage';
 import { HexApplicationsPage } from '@/src/pages/HexApplicationsPage';
 import { HexAdvantagesPage } from '@/src/pages/HexAdvantagesPage';
 const QualityLabPage = lazy(() =>
@@ -45,6 +48,11 @@ const MemorySizeLabPage = lazy(() =>
     default: module.MemorySizeLabPage,
   })),
 );
+const TransmissionLabPage = lazy(() =>
+  import('@/src/pages/TransmissionLabPage').then((module) => ({
+    default: module.TransmissionLabPage,
+  })),
+);
 
 function App() {
   return (
@@ -53,6 +61,24 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path={sectionRoute} element={<SectionPage />} />
         <Route path={storageSectionRoute} element={<StorageSectionPage />} />
+        <Route
+          path={transmissionSectionRoute}
+          element={<TransmissionSectionPage />}
+        />
+        <Route
+          path={transmissionLabRoute}
+          element={
+            <Suspense
+              fallback={
+                <output className="page-wrap block">
+                  Opening Transmission Lab…
+                </output>
+              }
+            >
+              <TransmissionLabPage />
+            </Suspense>
+          }
+        />
         <Route
           path={memorySizeLabRoute}
           element={

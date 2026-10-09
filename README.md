@@ -40,6 +40,16 @@ Topic 1.3, _Data storage and compression_, now includes **Memory Size Lab**:
 - **b ≠ B**: flip the eight bits in one byte. Its unsigned value changes, but the storage size remains 8 b = 1 B.
 - **Same storage**: enter 0–1,024 whole units and compare decimal and IEC labels for the exact same capacity. Presets include 1 TB, 1 TiB, 1 EiB and 8 bits. BigInt preserves exact counts above JavaScript's safe-integer range; ≈ identifies rounded ratios. PiB/EiB and PB/EB are marked as extensions in the folded teacher notes.
 
+## Transmission Lab
+
+Topic 2.1, _Types and methods of data transmission_, includes **Transmission Lab**:
+
+- **Mix & send**: combine serial/parallel with simplex/half-duplex/full-duplex. Send either editable byte or both; pause, step or replay the shared teaching clock.
+- **Serial vs parallel**: compare the same byte at the same per-lane rate. Enable illustrative timing skew and crosstalk, or click a trade-off to replay its evidence. Skew preserves lane identity; the explicit interference example flips b3.
+- **Direction modes**: three synchronised serial links show no reply, waiting for a reply, and simultaneous replies. Everyday analogies describe direction only.
+
+Sending slots exclude protocol overhead and real propagation delay. Distance and faults are deterministic teaching illustrations, not physical cable limits or measured error probabilities. Logical duplex paths do not specify a universal physical-wire arrangement. No new dependencies or test suites were added for this lab.
+
 ## Run locally
 
 Requirements: Node.js 22.13 or later and npm.
@@ -81,6 +91,8 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-2-text-sound-images/sound-sampling-studio` — Sound Sampling Studio
 - `#/topics/1-data-representation/1-2-text-sound-images/how-sound-becomes-binary` — How sound becomes binary
 - `#/topics/1-data-representation/1-2-text-sound-images/utf16-keyboard` — UTF-16 Keyboard
+- `#/topics/2-data-transmission/2-1-types-and-methods` — Topic 2.1
+- `#/topics/2-data-transmission/2-1-types-and-methods/transmission-lab` — Transmission Lab
 
 ## Teaching sound with a blind comparison
 

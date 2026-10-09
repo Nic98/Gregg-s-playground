@@ -17,11 +17,19 @@ export function StudioLayout({
   referenceTitle = 'Hex lookup & teacher notes',
 }: {
   title: string;
-  kind: 'text' | 'sound' | 'image' | 'hex' | 'quality' | 'files' | 'memory';
+  kind:
+    | 'text'
+    | 'sound'
+    | 'image'
+    | 'hex'
+    | 'quality'
+    | 'files'
+    | 'memory'
+    | 'transmission';
   children: ReactNode;
   reference: ReactNode;
   showSettings?: boolean;
-  sectionId?: '1.1' | '1.2' | '1.3';
+  sectionId?: '1.1' | '1.2' | '1.3' | '2.1';
   collapseReference?: boolean;
   referenceTitle?: string;
 }) {

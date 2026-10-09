@@ -61,8 +61,11 @@ function TopicShowcase({ topic }: { topic: SyllabusTopic }) {
 }
 
 function CompactTopicCard({ topic }: { topic: SyllabusTopic }) {
-  return (
-    <article className="topic-card topic-compact-card">
+  const firstLiveSection = topic.sections.find(
+    (section) => section.status === 'live' && section.route,
+  );
+  const content = (
+    <>
       <div className="topic-compact-card__number">
         {String(topic.number).padStart(2, '0')}
       </div>
@@ -70,8 +73,20 @@ function CompactTopicCard({ topic }: { topic: SyllabusTopic }) {
         <h3>{topic.title}</h3>
         <span>{sectionCount(topic)}</span>
       </div>
-      <ComingSoonBadge />
-    </article>
+      {firstLiveSection ? <LiveBadge /> : <ComingSoonBadge />}
+    </>
+  );
+
+  return firstLiveSection?.route ? (
+    <Link
+      to={firstLiveSection.route}
+      className="topic-card topic-compact-card topic-compact-card--live"
+      aria-label={`Explore topic ${topic.number}: ${topic.title}`}
+    >
+      {content}
+    </Link>
+  ) : (
+    <article className="topic-card topic-compact-card">{content}</article>
   );
 }
 
