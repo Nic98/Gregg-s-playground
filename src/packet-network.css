@@ -1,0 +1,254 @@
+.packet-network {
+  min-width: 0;
+  padding: 16px 16px 12px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+.packet-network__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+.packet-network__heading h2 {
+  font: 650 24px / 1.1 var(--font-heading);
+  letter-spacing: -0.035em;
+}
+.packet-network__heading > span {
+  font-size: 12px;
+  color: var(--muted-text);
+}
+.packet-network__canvas {
+  position: relative;
+  margin-top: 8px;
+}
+.packet-network__canvas > svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.packet-network__link {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.packet-network__active-link {
+  fill: none;
+  stroke: var(--acid-deep);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.packet-network__active-link--resend {
+  stroke: var(--violet);
+}
+.packet-network__request-link {
+  fill: none;
+  stroke: var(--violet);
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+}
+.packet-network__queue-link {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+.packet-network__endpoint {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.packet-network__endpoint--sender {
+  fill: #f5faec;
+}
+.packet-network__endpoint--receiver {
+  fill: #f5f4fc;
+}
+.packet-network__endpoint-title {
+  fill: var(--ink);
+  font: 750 14px var(--font-sans);
+}
+.packet-network__ip {
+  fill: var(--muted-text);
+  font:
+    500 12px ui-monospace,
+    monospace;
+}
+.packet-network__router {
+  fill: var(--ink);
+  stroke: white;
+  stroke-width: 3;
+}
+.packet-network__router--active {
+  stroke: var(--acid);
+  stroke-width: 4;
+}
+.packet-network__router-label {
+  fill: white;
+  font:
+    650 15px ui-monospace,
+    monospace;
+}
+.packet-network__socket {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-dasharray: 3 3;
+}
+.packet-network__socket-label {
+  fill: var(--muted-text);
+  font:
+    600 14px ui-monospace,
+    monospace;
+}
+.packet-network__route-label {
+  fill: var(--muted-text);
+  font: 600 12px var(--font-sans);
+}
+.packet-network__packet {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--surface);
+  border-radius: 12px;
+  background: var(--acid);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px #799452;
+  font:
+    800 18px / 1 ui-monospace,
+    monospace;
+  cursor: pointer;
+}
+.packet-network__packet--selected {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.packet-network__packet--valid {
+  background: var(--acid-soft);
+}
+.packet-network__packet--resent {
+  background: var(--violet-soft);
+}
+.packet-network__packet--damaged,
+.packet-network__packet--missing {
+  background: var(--danger-soft);
+  color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
+}
+.packet-network__packet--missing {
+  border-style: dashed;
+  border-color: var(--danger);
+}
+.packet-network__packet--selected.packet-network__packet--damaged,
+.packet-network__packet--selected.packet-network__packet--missing {
+  box-shadow: 0 0 0 2px var(--danger);
+}
+.packet-network__packet > svg,
+.packet-network__packet-symbol {
+  position: absolute;
+  right: -7px;
+  top: -7px;
+  width: 18px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 5px;
+  color: var(--surface);
+  background: var(--ink);
+}
+.packet-network__packet--damaged > svg,
+.packet-network__packet-symbol {
+  background: var(--danger);
+}
+.packet-network__packet-symbol {
+  font:
+    700 16px / 14px ui-monospace,
+    monospace;
+}
+.packet-network__request {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 9px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--surface);
+  border-radius: 8px;
+  background: var(--violet);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.packet-network__request svg {
+  width: 16px;
+  height: 16px;
+}
+.packet-network__message {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translate(-50%, -50%);
+  color: var(--ink);
+  font:
+    700 12px / 1.5 ui-monospace,
+    monospace;
+  white-space: nowrap;
+}
+.packet-network__message svg {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+}
+.packet-network__caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 4px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 650;
+}
+.packet-network__status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--violet);
+}
+.packet-network__status-dot--complete {
+  background: var(--acid-deep);
+}
+.packet-network__caption-note {
+  margin-left: auto;
+  color: var(--muted-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+@media (hover: hover) and (pointer: fine) {
+  .packet-network__packet:hover {
+    border-color: var(--ink);
+  }
+}
+@media (max-width: 639px) {
+  .packet-network {
+    padding: 14px 8px 12px;
+  }
+  .packet-network__heading h2 {
+    font-size: 22px;
+  }
+  .packet-network__heading > span,
+  .packet-network__caption-note {
+    display: none;
+  }
+}

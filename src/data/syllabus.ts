@@ -36,6 +36,7 @@ export const memorySizeLabRoute = `${storageSectionRoute}/memory-size-lab`;
 export const transmissionSectionRoute =
   '/topics/2-data-transmission/2-1-types-and-methods';
 export const transmissionLabRoute = `${transmissionSectionRoute}/transmission-lab`;
+export const packetSwitchingLabRoute = `${transmissionSectionRoute}/packet-switching-lab`;
 
 export interface StudioDemo {
   id:
@@ -171,7 +172,7 @@ export const storageDemos: (Omit<StudioDemo, 'id'> & { id: 'memory-size' })[] =
     },
   ];
 export const transmissionDemos: (Omit<StudioDemo, 'id'> & {
-  id: 'transmission';
+  id: 'transmission' | 'packet-switching';
 })[] = [
   {
     id: 'transmission',
@@ -181,6 +182,15 @@ export const transmissionDemos: (Omit<StudioDemo, 'id'> & {
     route: transmissionLabRoute,
     description: 'Mix the methods. Send the bits. See what arrives.',
     concepts: ['Serial & parallel', 'Direction modes', 'Skew & crosstalk'],
+  },
+  {
+    id: 'packet-switching',
+    title: 'Packet Switching Lab',
+    category: 'Packet switching',
+    status: 'live',
+    route: packetSwitchingLabRoute,
+    description: 'Split an email. Follow its packets. Put it back together.',
+    concepts: ['Packet structure', 'Router paths', 'Check & reassemble'],
   },
 ];
 export const allDemos = [

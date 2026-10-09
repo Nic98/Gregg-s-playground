@@ -50,6 +50,14 @@ Topic 2.1, _Types and methods of data transmission_, includes **Transmission Lab
 
 Sending slots exclude protocol overhead and real propagation delay. Distance and faults are deterministic teaching illustrations, not physical cable limits or measured error probabilities. Logical duplex paths do not specify a universal physical-wire arrangement. No new dependencies or test suites were added for this lab.
 
+## Packet Switching Lab
+
+Topic 2.1 also includes **Packet Switching Lab**, an eight-step guided email journey: split, add headers, add a trailer, send, route, check, request again and reassemble. Follow four numbered packets over a four-router network, compare arrival order with reconstructed order, and inspect each header, payload and checksum.
+
+Use **Next step** to animate one stage, **Play all** for the whole journey, or pause, go back and replay. Three deterministic scenarios show clean delivery, a missing packet, and a damaged packet (the default). Only packet 3 fails on its first attempt; only that packet is retransmitted. The restored message preserves every original space.
+
+This is a simplified syllabus packet model, not an implementation of IP or TCP. End systems split/check/reassemble; routers forward packets along available routes. The trailer contains an ASCII byte-sum checksum modulo 256, not CRC. Retransmission illustrates a reliable-delivery mechanism associated with Topic 2.2; packet switching alone does not guarantee it. Timings and timeout are illustrative. No new dependencies or test suites were added.
+
 ## Run locally
 
 Requirements: Node.js 22.13 or later and npm.
@@ -93,6 +101,7 @@ The site uses hash routing so every activity works on static GitHub Pages hostin
 - `#/topics/1-data-representation/1-2-text-sound-images/utf16-keyboard` — UTF-16 Keyboard
 - `#/topics/2-data-transmission/2-1-types-and-methods` — Topic 2.1
 - `#/topics/2-data-transmission/2-1-types-and-methods/transmission-lab` — Transmission Lab
+- `#/topics/2-data-transmission/2-1-types-and-methods/packet-switching-lab` — Packet Switching Lab
 
 ## Teaching sound with a blind comparison
 

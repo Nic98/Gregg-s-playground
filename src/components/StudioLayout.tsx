@@ -25,7 +25,8 @@ export function StudioLayout({
     | 'quality'
     | 'files'
     | 'memory'
-    | 'transmission';
+    | 'transmission'
+    | 'packet-switching';
   children: ReactNode;
   reference: ReactNode;
   showSettings?: boolean;

@@ -21,6 +21,7 @@ import {
   memorySizeLabRoute,
   transmissionSectionRoute,
   transmissionLabRoute,
+  packetSwitchingLabRoute,
 } from '@/src/data/syllabus';
 import { TextStudioPage } from '@/src/pages/TextStudioPage';
 import { SoundStudioPage } from '@/src/pages/SoundStudioPage';
@@ -53,6 +54,11 @@ const TransmissionLabPage = lazy(() =>
     default: module.TransmissionLabPage,
   })),
 );
+const PacketSwitchingLabPage = lazy(() =>
+  import('@/src/pages/PacketSwitchingLabPage').then((module) => ({
+    default: module.PacketSwitchingLabPage,
+  })),
+);
 
 function App() {
   return (
@@ -76,6 +82,20 @@ function App() {
               }
             >
               <TransmissionLabPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path={packetSwitchingLabRoute}
+          element={
+            <Suspense
+              fallback={
+                <output className="page-wrap block">
+                  Opening Packet Switching Lab…
+                </output>
+              }
+            >
+              <PacketSwitchingLabPage />
             </Suspense>
           }
         />
