@@ -635,8 +635,9 @@
   margin-top: 32px;
   max-width: 900px;
 }
-.transmission-launch-card {
-  display: grid;
+.chapter-studio.transmission-launch-card {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   background: var(--surface);
   padding: 28px;
